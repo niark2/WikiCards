@@ -7,6 +7,7 @@ import { SortOption } from "../_hooks/useCollectionState";
 interface CollectionHeaderProps {
     groupedCardsCount: number;
     totalCardsCount: number;
+    totalValue: number;
     filter: Rarity | "All";
     setFilter: (filter: Rarity | "All") => void;
     sortBy: SortOption;
@@ -24,6 +25,7 @@ const RARITIES: (Rarity | "All")[] = ["All", "Legendary", "Epic", "Rare", "Uncom
 export function CollectionHeader({
     groupedCardsCount,
     totalCardsCount,
+    totalValue,
     filter,
     setFilter,
     sortBy,
@@ -43,9 +45,18 @@ export function CollectionHeader({
                         <Layers className="text-indigo-500 w-8 h-8" />
                         My Collection
                     </h1>
-                    <p className="text-slate-400">
-                        You have collected <span className="text-white font-bold">{groupedCardsCount}</span> unique articles (<span className="text-indigo-400 font-bold">{totalCardsCount}</span> total cards).
-                    </p>
+                    <div className="flex flex-col gap-1">
+                        <p className="text-slate-400">
+                            You have collected <span className="text-white font-bold">{groupedCardsCount}</span> unique articles (<span className="text-indigo-400 font-bold">{totalCardsCount}</span> total cards).
+                        </p>
+                        <p className="text-slate-400 flex items-center gap-2">
+                            Total resale value:
+                            <span className="flex items-center gap-1 bg-amber-500/10 text-amber-500 px-2 py-0.5 rounded-full text-xs font-bold border border-amber-500/20">
+                                <span className="w-3 h-3 rounded-full bg-amber-500 flex items-center justify-center text-[8px] text-amber-950">W</span>
+                                {totalValue.toLocaleString()} WikiCoins
+                            </span>
+                        </p>
+                    </div>
                 </div>
 
                 <div className="flex items-center gap-2">

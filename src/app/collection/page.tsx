@@ -20,6 +20,7 @@ export default function CollectionPage() {
                 <CollectionHeader
                     groupedCardsCount={state.groupedCards.length}
                     totalCardsCount={state.cards.length}
+                    totalValue={state.totalCollectionValue}
                     filter={state.filter}
                     setFilter={state.setFilter}
                     sortBy={state.sortBy}

@@ -92,6 +92,10 @@ export function useCollectionState() {
         return groupedCards.slice(0, displayLimit);
     }, [groupedCards, displayLimit]);
 
+    const totalCollectionValue = useMemo(() => {
+        return cards.reduce((acc, c) => acc + (RARITY_SELL_VALUES[c.rarity] || 0), 0);
+    }, [cards]);
+
     // --- Handlers ---
 
     const handleDiscard = useCallback((card: WikiCard) => {
@@ -282,6 +286,7 @@ export function useCollectionState() {
         filteredCards,
         groupedCards,
         visibleCards,
+        totalCollectionValue,
         isLoading,
 
         // UI State
