@@ -31,8 +31,11 @@ export default function BoosterPage() {
                         <div className="flex flex-col gap-6">
                             {/* Classic Category */}
                             <div className="flex flex-col gap-1.5">
-                                <span className="text-[7px] font-black tracking-[0.4em] text-slate-500 uppercase px-2 mb-0.5">Classic Editions</span>
-                                {booster.availableThemes.filter(t => t.category !== 'ephemeral').map((theme: BoosterTheme) => (
+                                <div className="flex items-center gap-2 px-2 mb-0.5">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                                    <span className="text-[7px] font-black tracking-[0.4em] text-indigo-500 uppercase">Classic Editions</span>
+                                </div>
+                                {booster.availableThemes.filter(t => t.category === 'classic').map((theme: BoosterTheme) => (
                                     <button
                                         key={theme.id}
                                         onClick={() => booster.setSelectedThemeId(theme.id)}
@@ -57,6 +60,45 @@ export default function BoosterPage() {
                                             {theme.id === "" && (
                                                 <span className="text-[9px] font-bold opacity-50">All categories</span>
                                             )}
+                                        </div>
+                                        {booster.selectedThemeId === theme.id && (
+                                            <motion.div
+                                                layoutId="active-booster"
+                                                className="absolute right-3 w-1 h-1 rounded-full bg-white shadow-[0_0_8px_white]"
+                                            />
+                                        )}
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Thematic Category */}
+                            <div className="flex flex-col gap-1.5">
+                                <div className="flex items-center gap-2 px-2 mb-0.5">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-slate-500" />
+                                    <span className="text-[7px] font-black tracking-[0.4em] text-slate-500 uppercase">Thematic Editions</span>
+                                </div>
+                                {booster.availableThemes.filter(t => t.category === 'thematic').map((theme: BoosterTheme) => (
+                                    <button
+                                        key={theme.id}
+                                        onClick={() => booster.setSelectedThemeId(theme.id)}
+                                        className={`
+                                            group relative w-full p-2 rounded-lg transition-all duration-300 flex items-center gap-2.5 border text-left
+                                            ${booster.selectedThemeId === theme.id
+                                                ? 'bg-white/5 border-white/20 shadow-lg'
+                                                : 'bg-transparent border-transparent hover:bg-white/5 text-slate-500 hover:text-slate-300'
+                                            }
+                                        `}
+                                    >
+                                        <div
+                                            className="w-7 h-7 rounded-md flex items-center justify-center border transition-transform group-hover:scale-105"
+                                            style={{ backgroundColor: `${theme.color}15`, borderColor: `${theme.color}30` }}
+                                        >
+                                            <Sparkles className="w-3.5 h-3.5" style={{ color: theme.color }} />
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <span className={`text-[11px] font-black uppercase tracking-[0.2em] ${booster.selectedThemeId === theme.id ? 'text-white' : ''}`}>
+                                                {theme.label.replace(' Edition', '')}
+                                            </span>
                                         </div>
                                         {booster.selectedThemeId === theme.id && (
                                             <motion.div

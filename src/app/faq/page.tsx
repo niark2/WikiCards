@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Link from "next/link";
 import {
     HelpCircle,
     Zap,
@@ -21,7 +22,7 @@ const faqs = [
     },
     {
         question: "How is rarity determined?",
-        answer: "Rarity doesn't come from luck, but from the article's importance on Wikipedia! We use global view statistics from the last 30 days: \n\n• Legendary: +100,000 views/month\n• Epic: +20,000 views/month\n• Rare: +5,000 views/month\n• Uncommon: +500 views/month\n• Common: Less than 500 views/month",
+        answer: "Rarity is 100% authentic and based on the article's real importance on Wikipedia! We use global view statistics from the last 30 days:\n\n• Legendary: +100,000 views/month\n• Epic: +20,000 views/month\n• Rare: +5,000 views/month\n• Uncommon: +500 views/month\n• Common: Less than 500 views/month\n\nNote: We use zero artificial multipliers. Every card in your collection reflects the real-world popularity of its topic.",
         icon: <TrendingUp className="w-5 h-5 text-emerald-400" />
     },
     {
@@ -40,9 +41,14 @@ const faqs = [
         icon: <ShieldCheck className="w-5 h-5 text-blue-400" />
     },
     {
+        question: "What's inside the different booster packs?",
+        answer: "Every booster pack contains exactly 5 cards. We use a 'Natural Selection' system that fetches real Wikipedia articles until they naturally satisfy the pack's rarity targets:\n\n• Standard Edition (20 WikiCoins / 5 Free daily):\n- Pulls from all of Wikipedia.\n- Guaranteed 1 Uncommon or better.\n- 15% chance to find a WikiCoin pouch.\n\n• Iron Edition (80 WikiCoins):\n- Targets mid-tier popular articles (Top 500-1500).\n- Guaranteed 1 Rare or better.\n- 20% chance to find a WikiCoin pouch.\n\n• Thematic Editions (History, Science, Art - 120 WikiCoins):\n- Focused content (at least 2 guaranteed thematic articles).\n- Guaranteed 1 Uncommon or better.\n- 15% chance to find a WikiCoin pouch.\n\n• Golden Edition (200 WikiCoins):\n- Targets high-tier famous articles (Top 100-600).\n- Guaranteed 1 Epic or better.\n- 30% chance to find a WikiCoin pouch.\n\n• Uranium Edition (450 WikiCoins):\n- Targets the world's most viewed articles (Top 500).\n- Guaranteed 2 Epics or better.\n- 40% chance of a real Legendary card.\n- No Trash: Common cards are automatically filtered out.\n- 40% chance to find a WikiCoin pouch.\n\n• Ephemeral Edition (Cost varies):\n- Experimental packs with curated Wikipedia lists (like specific countries or events).",
+        icon: <Zap className="w-5 h-5 text-yellow-400" />
+    },
+    {
         question: "Is my data saved?",
         answer: "Currently, all your progress (collection, coins, folders) is stored locally in your browser. If you clear your cache or change browsers, you will lose your progress.",
-        icon: <Zap className="w-5 h-5 text-yellow-400" />
+        icon: <ShieldCheck className="w-5 h-5 text-blue-400" />
     }
 ];
 
@@ -112,8 +118,8 @@ export default function FAQPage() {
                     <h3 className="text-xl font-bold text-white mb-2">Still have questions?</h3>
                     <p className="text-slate-400 mb-6">Explore Wikipedia to discover the hidden secrets behind every card.</p>
                     <div className="flex justify-center gap-4">
-                        <a href="/" className="px-6 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl font-bold transition-all border border-white/10">Back to Home</a>
-                        <a href="/booster" className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold shadow-lg shadow-indigo-600/20 transition-all">Open a Booster</a>
+                        <Link href="/" className="px-6 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl font-bold transition-all border border-white/10">Back to Home</Link>
+                        <Link href="/booster" className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold shadow-lg shadow-indigo-600/20 transition-all">Open a Booster</Link>
                     </div>
                 </div>
             </div>

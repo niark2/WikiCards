@@ -18,6 +18,8 @@ export const metadata: Metadata = {
   description: "Collect Wikipedia knowledge as trading cards.",
 };
 
+import { Footer } from "@/components/Footer";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -26,10 +28,13 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body
-        className={`${outfit.variable} ${cinzel.variable} antialiased font-sans bg-slate-950 text-slate-50 min-h-screen pt-16`}
+        className={`${outfit.variable} ${cinzel.variable} antialiased font-sans bg-slate-950 text-slate-50 min-h-screen flex flex-col pt-16`}
       >
         <Navbar />
-        {children}
+        <main className="flex-1 flex flex-col">
+          {children}
+        </main>
+        <Footer />
       </body>
     </html>
   );

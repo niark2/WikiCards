@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { generateMarketSelection } from "@/lib/wikipedia";
+import { generateMarketSelection } from "@/lib/wiki";
 
 export async function GET() {
     try {

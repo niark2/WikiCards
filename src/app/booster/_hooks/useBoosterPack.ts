@@ -11,16 +11,18 @@ export interface BoosterTheme {
     color: string;
     dark: string;
     light: string;
-    category?: 'classic' | 'ephemeral';
+    category?: 'classic' | 'thematic' | 'ephemeral';
     cost?: number;
 }
 
 export const THEMES: BoosterTheme[] = [
     { id: "", label: "Standard Edition", color: "#e2e8f0", dark: "#64748b", light: "#ffffff", category: 'classic', cost: 20 },
-    { id: "history", label: "History Edition", color: "#dc2626", dark: "#991b1b", light: "#ef4444", category: 'classic', cost: 120 },
-    { id: "science", label: "Science Edition", color: "#0284c7", dark: "#075985", light: "#38bdf8", category: 'classic', cost: 120 },
-    { id: "art", label: "Art Edition", color: "#9333ea", dark: "#581c87", light: "#c084fc", category: 'classic', cost: 120 },
+    { id: "iron", label: "Iron Edition", color: "#64748b", dark: "#334155", light: "#94a3b8", category: 'classic', cost: 80 },
+    { id: "history", label: "History Edition", color: "#78350f", dark: "#451a03", light: "#92400e", category: 'thematic', cost: 120 },
+    { id: "science", label: "Science Edition", color: "#0284c7", dark: "#075985", light: "#38bdf8", category: 'thematic', cost: 120 },
+    { id: "art", label: "Art Edition", color: "#9333ea", dark: "#581c87", light: "#c084fc", category: 'thematic', cost: 120 },
     { id: "golden", label: "Golden Edition", color: "#eab308", dark: "#b45309", light: "#fde047", category: 'classic', cost: 200 },
+    { id: "uranium", label: "Uranium Edition", color: "#22c55e", dark: "#14532d", light: "#4ade80", category: 'classic', cost: 450 },
 ];
 
 const FREE_LIMIT = 5;

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { generateBoosterPack } from "@/lib/wikipedia";
+import { generateBoosterPack } from "@/lib/wiki";
 import fs from "fs";
 import path from "path";
 

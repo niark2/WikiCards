@@ -17,7 +17,7 @@ export function BoosterSachet({ selectedTheme, onClick }: BoosterSachetProps) {
                 whileTap={{ scale: 0.98 }}
                 animate={{ y: [0, -10, 0] }}
                 transition={{ y: { duration: 6, repeat: Infinity, ease: "easeInOut" } }}
-                className="booster-sachet group shadow-[0_30px_60px_-15px_rgba(0,0,0,0.6)] cursor-pointer"
+                className={`booster-sachet group shadow-[0_30px_60px_-15px_rgba(0,0,0,0.6)] cursor-pointer ${selectedTheme.id === 'uranium' ? 'nuclear-glow' : ''}`}
                 style={{
                     "--theme-color": selectedTheme.color,
                     "--theme-dark": selectedTheme.dark,
@@ -25,6 +25,14 @@ export function BoosterSachet({ selectedTheme, onClick }: BoosterSachetProps) {
                 } as React.CSSProperties}
                 onClick={onClick}
             >
+                {/* Uranium pulsing core */}
+                {selectedTheme.id === 'uranium' && (
+                    <motion.div
+                        animate={{ opacity: [0.2, 0.5, 0.2] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                        className="absolute inset-0 bg-[radial-gradient(circle_at_center,_#22c55e44_0%,_transparent_70%)] pointer-events-none z-0"
+                    />
+                )}
                 <div className="booster-sachet-seal top" />
                 <div className="booster-sachet-seal bottom" />
 
