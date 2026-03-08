@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Eye } from "lucide-react";
 import { memo } from "react";
 import { formatViews } from "@/lib/format";
+import { getCardGrade } from "@/lib/rarity";
 
 interface CardProps {
     card: WikiCard;

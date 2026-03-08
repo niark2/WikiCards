@@ -3,8 +3,9 @@
 import { WikiCard, Playlist } from "@/types";
 import { Card } from "@/components/Card";
 import { Trash2, PlusCircle } from "lucide-react";
-import { RARITY_SELL_VALUES } from "@/lib/rarity";
+import { calculateCardValue } from "@/lib/rarity";
 import { CardGroup } from "../_hooks/useCollectionState";
+
 
 interface CardGridProps {
     visibleCards: CardGroup[];
@@ -60,7 +61,7 @@ export function CardGrid({
                                 className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 rounded-full text-[10px] font-bold uppercase transition-colors"
                             >
                                 <Trash2 className="w-3 h-3" />
-                                +{RARITY_SELL_VALUES[card.rarity]}
+                                +{calculateCardValue(card)}
                             </button>
 
                             {activePlaylist !== "None" ? (

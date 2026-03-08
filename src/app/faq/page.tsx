@@ -26,8 +26,13 @@ const faqs = [
         icon: <TrendingUp className="w-5 h-5 text-emerald-400" />
     },
     {
+        question: "How is the card resale value calculated?",
+        answer: "The discard price for a card is dynamically calculated based on several factors:\n\n• Base Rarity: Ranging from 5 WikiCoins (Common) up to 1500 (Legendary).\n• Popularity Multiplier: Based on Wikipedia views. Most famous cards get up to a 2.5x multiplier on their base price.\n• Visual Bonus: Cards with a main illustration get a +25% value bonus.\n• Content Bonus: Long and detailed articles get an extra +10% bonus.\n\nPrices are capped between 5 and 5000 WikiCoins per card.",
+        icon: <TrendingUp className="w-5 h-5 text-indigo-400" />
+    },
+    {
         question: "How to get WikiCoins?",
-        answer: "You start with 50 WikiCoins. To earn more, you can sell cards you no longer want in your Collection. The rarer the card, the higher the resale value! You can also find coin pouches directly in boosters.",
+        answer: "You start with 50 WikiCoins. To earn more, you can sell cards you no longer want in your Collection. The rarer and more popular the card, the higher the resale value! You can also find coin pouches directly in boosters.",
         icon: <Coins className="w-5 h-5 text-amber-500" />
     },
     {

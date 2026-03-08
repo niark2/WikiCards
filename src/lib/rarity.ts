@@ -63,3 +63,59 @@ export const RARITY_MARKET_PRICES: Record<Rarity, number> = {
     Epic: 400,
     Legendary: 1000,
 };
+
+// --- Dynamic Card Logic ---
+
+export type CardGrade = "S" | "A" | "B" | "C" | "D";
+
+/** Get a subject's grade based on popularity (views) */
+export const getCardGrade = (views: number): CardGrade => {
+    if (views >= 1000000) return "S";
+    if (views >= 100000) return "A";
+    if (views >= 10000) return "B";
+    if (views >= 1000) return "C";
+    return "D";
+};
+
+/**
+ * Calculates a logical discard price for a card.
+ * Range: 5 to 5000 WikiCoins.
+ * Factors: Rarity, Views (Grade), Image, and Content.
+ */
+export const calculateCardValue = (card: { rarity: Rarity, views: number, imageUrl?: string | null, extract?: string }): number => {
+    // Base prices by rarity
+    const basePrices: Record<Rarity, number> = {
+        Common: 5,
+        Uncommon: 20,
+        Rare: 100,
+        Epic: 400,
+        Legendary: 1500,
+    };
+
+    const gradeMultipliers: Record<CardGrade, number> = {
+        S: 2.5,
+        A: 1.8,
+        B: 1.3,
+        C: 1.0,
+        D: 0.8,
+    };
+
+    const base = basePrices[card.rarity] || 5;
+    const grade = getCardGrade(card.views);
+    const multiplier = gradeMultipliers[grade];
+
+    let value = base * multiplier;
+
+    // Bonus for having an image (+25%)
+    if (card.imageUrl) {
+        value *= 1.25;
+    }
+
+    // Bonus for substantial content (+10%)
+    if (card.extract && card.extract.length > 200) {
+        value *= 1.1;
+    }
+
+    // Return floor value, bounded between 5 and 5000
+    return Math.min(5000, Math.max(5, Math.floor(value)));
+};

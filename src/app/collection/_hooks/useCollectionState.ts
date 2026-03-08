@@ -5,7 +5,7 @@ import { getCollection, getPlaylists, savePlaylists, removeCard, logActivity } f
 import { WikiCard, Rarity, Playlist } from "@/types";
 import { useCoins } from "@/hooks/useCoins";
 import { safeSetItem } from "@/lib/safe-storage";
-import { RARITY_SELL_VALUES, RARITY_SORT_ORDER } from "@/lib/rarity";
+import { calculateCardValue, RARITY_SORT_ORDER } from "@/lib/rarity";
 
 export type SortOption = "recent" | "rarity" | "alphabetical";
 
@@ -93,23 +93,24 @@ export function useCollectionState() {
     }, [groupedCards, displayLimit]);
 
     const totalCollectionValue = useMemo(() => {
-        return cards.reduce((acc, c) => acc + (RARITY_SELL_VALUES[c.rarity] || 0), 0);
+        return cards.reduce((acc, c) => acc + calculateCardValue(c), 0);
     }, [cards]);
 
     // --- Handlers ---
 
     const handleDiscard = useCallback((card: WikiCard) => {
-        if (confirm(`Discard ${card.title} for ${RARITY_SELL_VALUES[card.rarity]} WikiCoins?`)) {
+        const sellValue = calculateCardValue(card);
+        if (confirm(`Discard ${card.title} for ${sellValue} WikiCoins?`)) {
             removeCard(card.id);
-            addCoins(RARITY_SELL_VALUES[card.rarity]);
-            logActivity('card_sold', `Sold unique card: ${card.title}`, RARITY_SELL_VALUES[card.rarity]);
+            addCoins(sellValue);
+            logActivity('card_sold', `Sold unique card: ${card.title}`, sellValue);
             refreshData();
         }
     }, [addCoins, refreshData]);
 
     const handleBatchDiscard = useCallback(() => {
         const selectedCards = cards.filter(c => selectedCardIds.includes(c.id));
-        const totalCoins = selectedCards.reduce((acc, c) => acc + RARITY_SELL_VALUES[c.rarity], 0);
+        const totalCoins = selectedCards.reduce((acc, c) => acc + calculateCardValue(c), 0);
 
         if (confirm(`Discard ${selectedCardIds.length} selected cards for ${totalCoins} WikiCoins?`)) {
             selectedCardIds.forEach(id => removeCard(id));
