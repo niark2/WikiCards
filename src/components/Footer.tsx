@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Github, HelpCircle, MessageSquare } from "lucide-react";
+import { Github, HelpCircle, Ticket } from "lucide-react";
 
 export function Footer() {
     return (
@@ -30,11 +30,11 @@ export function Footer() {
                         GitHub
                     </Link>
                     <Link
-                        href="/support"
+                        href="/redeem"
                         className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 hover:text-indigo-400 transition-colors duration-300"
                     >
-                        <MessageSquare className="w-3 h-3" />
-                        Support
+                        <Ticket className="w-3 h-3" />
+                        Redeem
                     </Link>
                 </div>
             </div>

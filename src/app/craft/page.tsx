@@ -17,30 +17,14 @@ export default function CraftPage() {
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
     const { deductCoins, addCoins } = useCoins();
-    const [easterEgg, setEasterEgg] = useState(false);
 
     const handlePreview = async () => {
         if (!url) return;
-
-        if (url.trim().toLowerCase() === "supermotherlode777") {
-            addCoins(1000);
-            logActivity('coins_added', 'Cheat activated: supermotherlode777', 1000);
-            setEasterEgg(true);
-            setSuccess(true);
-            setUrl("");
-            setError(null);
-            setTimeout(() => {
-                setSuccess(false);
-                setEasterEgg(false);
-            }, 5000);
-            return;
-        }
 
         setLoading(true);
         setError(null);
         setCard(null);
         setSuccess(false);
-        setEasterEgg(false);
 
         try {
             const title = parseWikipediaIdentifier(url);
@@ -145,7 +129,7 @@ export default function CraftPage() {
                                         className="mt-6 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center gap-3 text-emerald-400 font-bold"
                                     >
                                         <CheckCircle2 className="w-5 h-5 shrink-0" />
-                                        {easterEgg ? "CHEATER! +1000 WikiCoins added to your balance." : "Card successfully forged and added to collection!"}
+                                        Card successfully forged and added to collection!
                                     </motion.div>
                                 )}
                             </AnimatePresence>

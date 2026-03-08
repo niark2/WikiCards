@@ -3,7 +3,7 @@ import { safeGetJSON, safeSetJSON, isClientSide } from "./safe-storage";
 
 export interface ActivityLog {
     id: string;
-    type: 'booster_opened' | 'card_sold' | 'folder_created' | 'coins_added' | 'card_crafted' | 'card_bought' | 'collection_exported' | 'collection_imported';
+    type: 'booster_opened' | 'card_sold' | 'folder_created' | 'coins_added' | 'card_crafted' | 'card_bought' | 'collection_exported' | 'collection_imported' | 'code_redeemed';
     message: string;
     amount?: number;
     timestamp: number;
@@ -14,6 +14,7 @@ const PLAYLIST_KEY = "wikicards_playlists";
 const LOGS_KEY = "wikicards_logs";
 const DAILY_BOOSTER_KEY = "wikicards_daily_booster";
 const MARKET_KEY = "wikicards_daily_market";
+const REDEEMED_CODES_KEY = "wikicards_redeemed_codes";
 
 export interface DailyBoosterInfo {
     count: number;
@@ -132,4 +133,17 @@ export const getMarketInfo = (): MarketInfo | null => {
 export const saveMarketInfo = (info: MarketInfo): void => {
     if (!isClientSide()) return;
     safeSetJSON(MARKET_KEY, info);
+};
+
+export const getRedeemedCodes = (): string[] => {
+    return safeGetJSON<string[]>(REDEEMED_CODES_KEY, []);
+};
+
+export const markCodeAsRedeemed = (code: string): void => {
+    if (!isClientSide()) return;
+    const redeemed = getRedeemedCodes();
+    if (!redeemed.includes(code)) {
+        redeemed.push(code);
+        safeSetJSON(REDEEMED_CODES_KEY, redeemed);
+    }
 };
