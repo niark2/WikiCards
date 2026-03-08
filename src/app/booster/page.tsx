@@ -1,0 +1,172 @@
+"use client";
+
+import { motion } from "framer-motion";
+import { useBoosterPack, BoosterTheme } from "./_hooks/useBoosterPack";
+import { BoosterSachet, LoadingSpinner } from "./_components/BoosterSachet";
+import { ThemeSelector, OpenButton } from "./_components/BoosterControls";
+import { CardCarousel } from "./_components/CardCarousel";
+import { Sparkles } from "lucide-react";
+
+export default function BoosterPage() {
+    const booster = useBoosterPack();
+
+    return (
+        <div className="flex h-[calc(100vh-4rem)] text-center relative w-full overflow-hidden bg-slate-950">
+            {/* Background Effects */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-500/5 blur-[120px] rounded-full pointer-events-none -z-10" />
+
+            {!booster.cards && (
+                <div className="flex w-full h-full">
+                    {/* Left Sidebar for Editions */}
+                    <motion.div
+                        initial={{ opacity: 0, x: -50 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        className="w-64 h-full bg-slate-900/40 backdrop-blur-2xl border-r border-white/5 p-4 flex flex-col gap-6 z-20"
+                    >
+                        <div className="flex flex-col gap-1.5 text-left">
+                            <span className="text-[9px] font-black tracking-[0.4em] text-indigo-500 uppercase">Library</span>
+                            <h2 className="text-2xl font-serif font-black text-white leading-none">Choose an <span className="text-indigo-400">Edition</span></h2>
+                        </div>
+
+                        <div className="flex flex-col gap-6">
+                            {/* Classic Category */}
+                            <div className="flex flex-col gap-1.5">
+                                <span className="text-[7px] font-black tracking-[0.4em] text-slate-500 uppercase px-2 mb-0.5">Classic Editions</span>
+                                {booster.availableThemes.filter(t => t.category !== 'ephemeral').map((theme: BoosterTheme) => (
+                                    <button
+                                        key={theme.id}
+                                        onClick={() => booster.setSelectedThemeId(theme.id)}
+                                        className={`
+                                            group relative w-full p-2 rounded-lg transition-all duration-300 flex items-center gap-2.5 border text-left
+                                            ${booster.selectedThemeId === theme.id
+                                                ? 'bg-white/5 border-white/20 shadow-lg'
+                                                : 'bg-transparent border-transparent hover:bg-white/5 text-slate-500 hover:text-slate-300'
+                                            }
+                                        `}
+                                    >
+                                        <div
+                                            className="w-7 h-7 rounded-md flex items-center justify-center border transition-transform group-hover:scale-105"
+                                            style={{ backgroundColor: `${theme.color}15`, borderColor: `${theme.color}30` }}
+                                        >
+                                            <Sparkles className="w-3.5 h-3.5" style={{ color: theme.color }} />
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <span className={`text-[11px] font-black uppercase tracking-[0.2em] ${booster.selectedThemeId === theme.id ? 'text-white' : ''}`}>
+                                                {theme.label.replace(' Edition', '')}
+                                            </span>
+                                            {theme.id === "" && (
+                                                <span className="text-[9px] font-bold opacity-50">All categories</span>
+                                            )}
+                                        </div>
+                                        {booster.selectedThemeId === theme.id && (
+                                            <motion.div
+                                                layoutId="active-booster"
+                                                className="absolute right-3 w-1 h-1 rounded-full bg-white shadow-[0_0_8px_white]"
+                                            />
+                                        )}
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Ephemeral Category */}
+                            <div className="flex flex-col gap-1.5">
+                                <div className="flex items-center gap-2 px-2 mb-0.5">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
+                                    <span className="text-[7px] font-black tracking-[0.4em] text-rose-500 uppercase">Ephemeral</span>
+                                </div>
+                                {booster.availableThemes.filter(t => t.category === 'ephemeral').map((theme: BoosterTheme) => (
+                                    <button
+                                        key={theme.id}
+                                        onClick={() => booster.setSelectedThemeId(theme.id)}
+                                        className={`
+                                            group relative w-full p-2 rounded-lg transition-all duration-300 flex items-center gap-2.5 border text-left
+                                            ${booster.selectedThemeId === theme.id
+                                                ? 'bg-red-950/20 border-red-500/30 shadow-[0_0_10px_rgba(255,0,0,0.1)]'
+                                                : 'bg-transparent border-transparent hover:bg-white/5 text-slate-500 hover:text-slate-300'
+                                            }
+                                        `}
+                                    >
+                                        <div
+                                            className="w-7 h-7 rounded-md flex items-center justify-center border transition-transform group-hover:scale-105"
+                                            style={{ backgroundColor: `${theme.color}15`, borderColor: `${theme.color}30` }}
+                                        >
+                                            <Sparkles className="w-3.5 h-3.5" style={{ color: theme.color }} />
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <span className={`text-[11px] font-black uppercase tracking-[0.2em] ${booster.selectedThemeId === theme.id ? 'text-white' : ''}`}>
+                                                {theme.label.replace(' Edition', '')}
+                                            </span>
+                                        </div>
+                                        {booster.selectedThemeId === theme.id && (
+                                            <motion.div
+                                                layoutId="active-booster"
+                                                className="absolute right-3 w-1 h-1 rounded-full bg-red-500 shadow-[0_0_8px_rgba(255,0,0,0.6)]"
+                                            />
+                                        )}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    </motion.div>
+
+                    {/* Main Content Area */}
+                    <div className="flex-1 flex flex-col items-center justify-center p-12 relative overflow-hidden">
+                        {booster.loading ? (
+                            <LoadingSpinner />
+                        ) : (
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                className="w-full h-full flex flex-col items-center justify-center"
+                            >
+                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full opacity-20 pointer-events-none"
+                                    style={{
+                                        background: `radial-gradient(circle at center, ${booster.selectedTheme.color}33 0%, transparent 70%)`
+                                    }}
+                                />
+
+                                <div className="relative z-10 flex flex-col items-center gap-12 max-w-2xl w-full">
+                                    <BoosterSachet
+                                        selectedTheme={booster.selectedTheme}
+                                        onClick={booster.openBooster}
+                                    />
+
+                                    <div className="flex flex-col items-center gap-4 w-full">
+                                        <OpenButton
+                                            onClick={booster.openBooster}
+                                            loading={booster.loading}
+                                            coins={booster.coins}
+                                            cost={booster.cost}
+                                            selectedTheme={booster.selectedTheme}
+                                            isStandardFree={booster.isStandardFree}
+                                            freeRemaining={booster.freeRemaining}
+                                            selectedThemeId={booster.selectedThemeId}
+                                        />
+                                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em] animate-pulse">
+                                            Click on the booster to summon it
+                                        </p>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
+                    </div>
+                </div>
+            )}
+
+            {booster.cards && !booster.loading && (
+                <div className="w-full h-full flex items-center justify-center p-6">
+                    <CardCarousel
+                        cards={booster.cards}
+                        revealed={booster.revealed}
+                        currentIndex={booster.currentIndex}
+                        setCurrentIndex={booster.setCurrentIndex}
+                        goToPreviousCard={booster.goToPreviousCard}
+                        goToNextCard={booster.goToNextCard}
+                        selectedTheme={booster.selectedTheme}
+                        resetPack={booster.resetPack}
+                    />
+                </div>
+            )}
+        </div>
+    );
+}

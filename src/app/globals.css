@@ -1,0 +1,218 @@
+@import "tailwindcss";
+@source "../../src";
+
+@theme {
+  --animate-shimmer: shimmer 2.5s linear infinite;
+  --animate-float: float 6s ease-in-out infinite;
+
+  @keyframes shimmer {
+    from {
+      background-position: 200% center;
+    }
+
+    to {
+      background-position: -200% center;
+    }
+  }
+
+  @keyframes float {
+
+    0%,
+    100% {
+      transform: translateY(0) rotate(0);
+    }
+
+    50% {
+      transform: translateY(-10px) rotate(0.5deg);
+    }
+  }
+
+  @keyframes gold-shine {
+    0% {
+      background-position: -200% center;
+    }
+
+    100% {
+      background-position: 200% center;
+    }
+  }
+}
+
+:root {
+  --background: #020617;
+  /* Slate 950 */
+  --foreground: #f8fafc;
+}
+
+html,
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-outfit), system-ui, sans-serif !important;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* Nuclear fix for fonts */
+.font-sans {
+  font-family: var(--font-outfit), system-ui, sans-serif !important;
+}
+
+.font-serif {
+  font-family: var(--font-cinzel), Georgia, serif !important;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+}
+
+/* --- Realistic Foil Booster Sachet --- */
+
+.booster-sachet {
+  --theme-color: #f1f5f9;
+  --theme-dark: #cbd5e1;
+  --theme-light: #ffffff;
+
+  --foil-sheen: linear-gradient(105deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.05) 30%,
+      rgba(255, 255, 255, 0.4) 45%,
+      rgba(255, 255, 255, 0.5) 50%,
+      rgba(255, 255, 255, 0.4) 55%,
+      rgba(255, 255, 255, 0.05) 70%,
+      rgba(255, 255, 255, 0) 100%);
+
+  position: relative;
+  width: 280px;
+  height: 480px;
+  background-color: var(--theme-color, #f1f5f9);
+
+  /* Base color + subtle vertical "volume" gradient + metallic sheen */
+  background-image:
+    var(--foil-sheen),
+    linear-gradient(90deg,
+      rgba(0, 0, 0, 0.15) 0%,
+      rgba(255, 255, 255, 0.1) 10%,
+      transparent 30%,
+      transparent 70%,
+      rgba(255, 255, 255, 0.1) 90%,
+      rgba(0, 0, 0, 0.15) 100%),
+    linear-gradient(135deg, var(--theme-dark, #cbd5e1) 0%, var(--theme-color, #f1f5f9) 50%, var(--theme-light, #ffffff) 100%);
+
+  background-size: 250% 100%, 100% 100%, cover;
+  background-position: 100% 0, 0 0, center;
+
+  /* Sachet volume effect */
+  box-shadow:
+    0 30px 60px -15px rgba(0, 0, 0, 0.8),
+    inset 0 0 60px rgba(0, 0, 0, 0.1),
+    inset 1px 0 2px rgba(255, 255, 255, 0.4),
+    inset -1px 0 2px rgba(0, 0, 0, 0.3);
+
+  /* Precise Zig-Zag Crimping - Deeper for visibility */
+  clip-path: polygon(0% 6px, 2.5% 0px, 5% 6px, 7.5% 0px, 10% 6px, 12.5% 0px, 15% 6px, 17.5% 0px, 20% 6px, 22.5% 0px, 25% 6px, 27.5% 0px, 30% 6px, 32.5% 0px, 35% 6px, 37.5% 0px, 40% 6px, 42.5% 0px, 45% 6px, 47.5% 0px, 50% 6px, 52.5% 0px, 55% 6px, 57.5% 0px, 60% 6px, 62.5% 0px, 65% 6px, 67.5% 0px, 70% 6px, 72.5% 0px, 75% 6px, 77.5% 0px, 80% 6px, 82.5% 0px, 85% 6px, 87.5% 0px, 90% 6px, 92.5% 0px, 95% 6px, 97.5% 0px, 100% 6px,
+      100% calc(100% - 6px), 97.5% 100%, 95% calc(100% - 6px), 92.5% 100%, 90% calc(100% - 6px), 87.5% 100%, 85% calc(100% - 6px), 82.5% 100%, 80% calc(100% - 6px), 77.5% 100%, 75% calc(100% - 6px), 72.5% 100%, 70% calc(100% - 6px), 67.5% 100%, 65% calc(100% - 6px), 62.5% 100%, 60% calc(100% - 6px), 57.5% 100%, 55% calc(100% - 6px), 52.5% 100%, 50% calc(100% - 6px), 47.5% 100%, 45% calc(100% - 6px), 42.5% 100%, 40% calc(100% - 6px), 37.5% 100%, 35% calc(100% - 6px), 32.5% 100%, 30% calc(100% - 6px), 27.5% 100%, 25% calc(100% - 6px), 22.5% 100%, 20% calc(100% - 6px), 17.5% 100%, 15% calc(100% - 6px), 12.5% 100%, 10% calc(100% - 6px), 7.5% 100%, 5% calc(100% - 6px), 2.5% 100%, 0% calc(100% - 6px));
+
+  transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.booster-sachet::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+  opacity: 0.6;
+  mix-blend-mode: overlay;
+}
+
+.booster-sachet:hover {
+  transform: translateY(-12px) scale(1.02) rotateX(5deg);
+  background-position: 0 0, 0 0, center;
+  box-shadow:
+    0 50px 80px -20px rgba(0, 0, 0, 0.9),
+    inset 0 0 50px rgba(255, 255, 255, 0.3);
+}
+
+/* Horizontal seal lines (crimping lines) with vertical textures */
+.booster-sachet-seal {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 42px;
+  /* Transparent background to let the theme color shine through */
+  background-color: rgba(0, 0, 0, 0.05);
+  background-image:
+    /* The horizontal crimp lines - More contrast */
+    repeating-linear-gradient(0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.2) 3px,
+      rgba(255, 255, 255, 0.15) 4px),
+    /* The vertical crimp texture */
+    repeating-linear-gradient(90deg,
+      transparent,
+      transparent 3px,
+      rgba(0, 0, 0, 0.25) 4px,
+      transparent 5px);
+  border-bottom: 1.5px solid rgba(0, 0, 0, 0.4);
+  border-top: 1.5px solid rgba(255, 255, 255, 0.4);
+  z-index: 10;
+  /* Stronger depth effect */
+  box-shadow:
+    inset 0 15px 15px -10px rgba(0, 0, 0, 0.4),
+    inset 0 -15px 15px -10px rgba(255, 255, 255, 0.2),
+    0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.booster-sachet-seal::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  pointer-events: none;
+}
+
+.booster-sachet-seal.top {
+  top: 0;
+}
+
+.booster-sachet-seal.bottom {
+  bottom: 0;
+  transform: rotate(180deg);
+}
+
+.booster-sachet-content {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  z-index: 5;
+}
+
+/* Card Rarity Holographics */
+.holo-overlay {
+  background: linear-gradient(115deg,
+      transparent 20%,
+      rgba(255, 255, 255, 0.1) 30%,
+      rgba(255, 0, 255, 0.2) 40%,
+      rgba(0, 255, 255, 0.2) 50%,
+      rgba(255, 255, 255, 0.1) 60%,
+      transparent 80%);
+  background-size: 200% auto;
+  mix-blend-mode: color-dodge;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.card:hover .holo-overlay {
+  opacity: 0.5;
+  animation: shimmer 3s linear infinite;
+}
