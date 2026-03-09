@@ -73,7 +73,8 @@ export function useBoosterPack() {
     }, []);
 
     const openBooster = useCallback(async () => {
-        if (cost > 0 && !deductCoins(cost)) {
+        // Pre-check balance without deducting yet
+        if (cost > 0 && coins < cost) {
             alert("Not enough WikiCoins! Discard cards in your collection to get more.");
             return;
         }
@@ -85,9 +86,24 @@ export function useBoosterPack() {
 
         try {
             const res = await fetch(`/api/booster${selectedThemeId ? `?theme=${encodeURIComponent(selectedThemeId)}` : ""}`);
+
+            if (!res.ok) {
+                throw new Error("Failed to fetch booster pack from server.");
+            }
+
             const data = await res.json();
 
-            if (data.cards) {
+            if (data.cards && Array.isArray(data.cards) && data.cards.length > 0) {
+                // Now that we have the cards, deduct the coins
+                if (cost > 0) {
+                    const success = deductCoins(cost);
+                    if (!success) {
+                        alert("Not enough WikiCoins! (Your balance might have changed)");
+                        setLoading(false);
+                        return;
+                    }
+                }
+
                 setCards(data.cards);
 
                 const articles = (data.cards as WikiCard[]).filter(c => !c.isCoinValue);
@@ -108,14 +124,16 @@ export function useBoosterPack() {
                 });
 
                 revealCardsSequentially(data.cards);
+            } else {
+                throw new Error("Booster pack generation failed or returned empty.");
             }
         } catch (e) {
             console.error(e);
-            alert("Failed to fetch booster pack.");
+            alert(e instanceof Error ? e.message : "Failed to fetch booster pack.");
         } finally {
             setLoading(false);
         }
-    }, [cost, deductCoins, selectedThemeId, selectedTheme.label, addCoins, revealCardsSequentially]);
+    }, [cost, coins, deductCoins, selectedThemeId, selectedTheme.label, addCoins, revealCardsSequentially]);
 
     const resetPack = useCallback(() => {
         setCards(null);

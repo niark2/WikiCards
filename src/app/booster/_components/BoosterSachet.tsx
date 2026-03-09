@@ -42,7 +42,7 @@ export function BoosterSachet({ selectedTheme, onClick }: BoosterSachetProps) {
 
                     <div className="w-full flex flex-col items-center pt-8">
                         {/* The Globe */}
-                        <div className="w-44 h-44 relative mb-6 drop-shadow-lg">
+                        <div className="w-28 h-28 md:w-44 md:h-44 relative mb-4 md:mb-6 drop-shadow-lg">
                             <img
                                 src="https://upload.wikimedia.org/wikipedia/commons/8/80/Wikipedia-logo-v2.svg"
                                 alt="Wikipedia Globe"
@@ -52,7 +52,7 @@ export function BoosterSachet({ selectedTheme, onClick }: BoosterSachetProps) {
 
                         {/* WikiCards Text */}
                         <div className="mix-blend-multiply opacity-70 mb-4">
-                            <h2 className="font-sans text-3xl tracking-[0.15em] text-black font-semibold leading-none">
+                            <h2 className="font-sans text-xl md:text-3xl tracking-[0.15em] text-black font-semibold leading-none">
                                 WIKICARDS
                             </h2>
                         </div>

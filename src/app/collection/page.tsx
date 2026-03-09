@@ -11,7 +11,7 @@ export default function CollectionPage() {
     const state = useCollectionState();
 
     return (
-        <div className="min-h-screen w-full bg-slate-950 text-white relative overflow-x-hidden pt-24 pb-20">
+        <div className="min-h-screen w-full bg-slate-950 text-white relative overflow-x-hidden pt-20 md:pt-24 pb-20">
             {/* Background Effects */}
             <div className="fixed top-0 left-1/4 w-[500px] h-[500px] bg-indigo-500/10 blur-[150px] rounded-full pointer-events-none -z-10" />
             <div className="fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-pink-500/5 blur-[150px] rounded-full pointer-events-none -z-10" />

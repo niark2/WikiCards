@@ -11,24 +11,48 @@ export default function BoosterPage() {
     const booster = useBoosterPack();
 
     return (
-        <div className="flex h-[calc(100vh-4rem)] text-center relative w-full overflow-hidden bg-slate-950">
+        <div className="flex flex-col md:flex-row min-h-[calc(100vh-4rem)] relative w-full overflow-hidden bg-slate-950 items-stretch">
             {/* Background Effects */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-500/5 blur-[120px] rounded-full pointer-events-none -z-10" />
 
             {!booster.cards && (
-                <div className="flex w-full h-full">
-                    {/* Left Sidebar for Editions */}
+                <div className="flex flex-col md:flex-row w-full flex-1">
+                    {/* Left Sidebar for Editions — on mobile: horizontal strip at top */}
                     <motion.div
                         initial={{ opacity: 0, x: -50 }}
                         animate={{ opacity: 1, x: 0 }}
-                        className="w-64 h-full bg-slate-900/40 backdrop-blur-2xl border-r border-white/5 p-4 flex flex-col gap-6 z-20"
+                        className="w-full md:w-64 bg-slate-900/40 backdrop-blur-2xl border-b md:border-b-0 md:border-r border-white/5 p-3 md:p-4 flex md:flex-col gap-3 md:gap-6 z-20 overflow-x-auto md:overflow-x-visible md:overflow-y-auto md:min-h-full"
                     >
-                        <div className="flex flex-col gap-1.5 text-left">
+                        {/* Title — hidden on mobile, shown on desktop */}
+                        <div className="hidden md:flex flex-col gap-1.5 text-left">
                             <span className="text-[9px] font-black tracking-[0.4em] text-indigo-500 uppercase">Library</span>
                             <h2 className="text-2xl font-serif font-black text-white leading-none">Choose an <span className="text-indigo-400">Edition</span></h2>
                         </div>
 
-                        <div className="flex flex-col gap-6">
+                        {/* Mobile: horizontal flat list / Desktop: categorized list */}
+                        <div className="flex md:hidden gap-2 items-center flex-nowrap min-w-max">
+                            {booster.availableThemes.map((theme: BoosterTheme) => (
+                                <button
+                                    key={theme.id}
+                                    onClick={() => booster.setSelectedThemeId(theme.id)}
+                                    className={`
+                                        shrink-0 px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all flex items-center gap-2 border whitespace-nowrap
+                                        ${booster.selectedThemeId === theme.id
+                                            ? theme.category === 'ephemeral'
+                                                ? 'bg-red-950/20 border-red-500/30 text-white'
+                                                : 'bg-white/5 border-white/20 text-white'
+                                            : 'bg-transparent border-transparent text-slate-500'
+                                        }
+                                    `}
+                                >
+                                    <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: theme.color }} />
+                                    {theme.label.replace(' Edition', '')}
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* Desktop: categorized list */}
+                        <div className="hidden md:flex flex-col gap-6">
                             {/* Classic Category */}
                             <div className="flex flex-col gap-1.5">
                                 <div className="flex items-center gap-2 px-2 mb-0.5">
@@ -152,7 +176,7 @@ export default function BoosterPage() {
                     </motion.div>
 
                     {/* Main Content Area */}
-                    <div className="flex-1 flex flex-col items-center justify-center p-12 relative overflow-hidden">
+                    <div className="flex-1 flex flex-col items-center justify-center p-4 md:p-12 relative overflow-hidden">
                         {booster.loading ? (
                             <LoadingSpinner />
                         ) : (
@@ -167,7 +191,7 @@ export default function BoosterPage() {
                                     }}
                                 />
 
-                                <div className="relative z-10 flex flex-col items-center gap-12 max-w-2xl w-full">
+                                <div className="relative z-10 flex flex-col items-center gap-8 md:gap-12 max-w-2xl w-full">
                                     <BoosterSachet
                                         selectedTheme={booster.selectedTheme}
                                         onClick={booster.openBooster}
@@ -196,7 +220,7 @@ export default function BoosterPage() {
             )}
 
             {booster.cards && !booster.loading && (
-                <div className="w-full h-full flex items-center justify-center p-6">
+                <div className="w-full min-h-[calc(100vh-4rem)] flex items-center justify-center p-2 md:p-6">
                     <CardCarousel
                         cards={booster.cards}
                         revealed={booster.revealed}

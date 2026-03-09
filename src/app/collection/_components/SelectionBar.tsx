@@ -20,13 +20,13 @@ export function SelectionBar({
 
     return (
         <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] animate-in fade-in slide-in-from-bottom-8">
-            <div className="bg-slate-900 border border-indigo-500/30 rounded-full px-6 py-3 flex items-center gap-6 shadow-[0_20px_50px_rgba(0,0,0,0.5)] backdrop-blur-xl">
+            <div className="bg-slate-900 border border-indigo-500/30 rounded-2xl md:rounded-full px-4 md:px-6 py-3 flex flex-wrap items-center gap-3 md:gap-6 shadow-[0_20px_50px_rgba(0,0,0,0.5)] backdrop-blur-xl max-w-[calc(100%-2rem)]">
                 <div className="flex items-center gap-2">
                     <Layers className="w-4 h-4 text-indigo-400" />
                     <span className="text-sm font-black text-white">{selectedCount} <span className="text-slate-500 font-medium">Selected</span></span>
                 </div>
 
-                <div className="h-6 w-px bg-white/10" />
+                <div className="hidden md:block h-6 w-px bg-white/10" />
 
                 <div className="flex items-center gap-2">
                     <button

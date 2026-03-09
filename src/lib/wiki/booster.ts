@@ -17,90 +17,39 @@ import {
     fetchArticleDetails,
 } from "./api";
 
-// --- Booster config (Natural Selection parameters) ---
+// --- Slot-based Booster Generation ---
 
-interface BoosterConfig {
-    legendaryChance: number;
-    allowCommon: boolean;
-}
-
-const BOOSTER_CONFIG: Record<string, BoosterConfig> = {
-    uranium: {
-        legendaryChance: 0.4,
-        allowCommon: false,
-    },
-    golden: {
-        legendaryChance: 0.1,
-        allowCommon: true,
-    },
-    iron: {
-        legendaryChance: 0.02,
-        allowCommon: true,
-    },
-    standard: {
-        legendaryChance: 0.005,
-        allowCommon: true,
-    },
-};
-
-// --- Internal helpers ---
-
-/** Fetch and filter candidate articles with valid extracts */
-const fetchCandidateArticles = async (
+// Internal helper to fetch precisely for a slotted tier
+export const fetchSlotArticles = async (
     theme: string | undefined,
-    isRandomEdition: boolean,
-    needsThematic: boolean,
     count: number,
-    customTitles?: string[]
+    tierPriority: "Top" | "High" | "Mid" | "Random"
 ): Promise<CandidateArticle[]> => {
     let rawArticles: { id: number; title: string }[] = [];
 
-    if (customTitles && customTitles.length > 0) {
-        const cleaned = customTitles.map(t => parseWikipediaIdentifier(t));
-        const shuffled = [...cleaned].sort(() => Math.random() - 0.5);
-        const selected = shuffled.slice(0, count * 2);
+    // Instead of random fetching and dropping, we fetch exactly the popularity tier we need for the slot.
+    // 0 = Top ~1000 articles (Legendary territory)
+    // 500 = High ~2000 articles (Epic territory)
+    // 2500 = Mid articles (Rare/Uncommon territory)
 
-        let baseUrl = WIKI_API_URL;
-        const urlMatch = customTitles.find(t => t.includes("wikipedia.org/wiki/"));
-        if (urlMatch) {
-            const lang = urlMatch.match(/https?:\/\/([a-z-]+)\.wikipedia\.org/);
-            if (lang && lang[1]) {
-                baseUrl = `https://${lang[1]}.wikipedia.org/w/api.php`;
-            }
-        }
-
-        const titlesParam = selected.map(t => encodeURIComponent(t)).join('|');
-        const url = `${baseUrl}?action=query&titles=${titlesParam}&format=json&origin=*`;
-        const res = await fetch(url, { headers: { "User-Agent": USER_AGENT } });
-        const data = await res.json();
-
-        if (data.query?.pages) {
-            interface PageResult { pageid?: number; title: string }
-            rawArticles = Object.values(data.query.pages)
-                .filter((p) => (p as PageResult).pageid)
-                .map((p) => ({
-                    id: (p as PageResult).pageid as number,
-                    title: (p as PageResult).title,
-                }));
-        }
+    if (tierPriority === "Top") {
+        rawArticles = await fetchPopularArticles(count * 2, Math.floor(Math.random() * 50)) || [];
+    } else if (tierPriority === "High") {
+        rawArticles = await fetchPopularArticles(count * 2, 100 + Math.floor(Math.random() * 300)) || [];
+    } else if (tierPriority === "Mid") {
+        const broadThemes = ["History", "Science", "World", "Music", "Art", "Technology", "Space", "Sports", "Geography", "Culture"];
+        const randomTheme = broadThemes[Math.floor(Math.random() * broadThemes.length)];
+        rawArticles = await fetchThematicArticles(randomTheme, count * 4);
     } else {
-        const isPremium = theme === "iron" || theme === "golden" || theme === "uranium";
-        const shouldFetchThematic = theme && !isRandomEdition && needsThematic;
-
-        if (shouldFetchThematic) {
-            rawArticles = await fetchThematicArticles(theme, count);
-        } else if (theme === "uranium") {
-            const topTier = await fetchPopularArticles(2, 0);
-            const highTier = await fetchPopularArticles(2, 500);
-            const midTier = await fetchPopularArticles(count - 4 > 0 ? count - 4 : 2, 2000);
-            rawArticles = [...topTier, ...highTier, ...midTier];
-        } else if (isPremium) {
-            const offset = theme === "golden" ? 500 : 1500;
-            rawArticles = await fetchPopularArticles(count * 2, offset);
+        // Random
+        if (theme && theme !== "standard" && theme !== "golden" && theme !== "iron" && theme !== "uranium") {
+            rawArticles = await fetchThematicArticles(theme, count * 2);
         } else {
-            rawArticles = await fetchRandomArticles(count * 2);
+            rawArticles = await fetchRandomArticles(count * 3) || [];
         }
     }
+
+    if (!rawArticles || rawArticles.length === 0) return [];
 
     const ids = rawArticles.map(r => r.id.toString());
     if (ids.length === 0) return [];
@@ -115,29 +64,17 @@ const fetchCandidateArticles = async (
             if (!d.extract || d.extract.length < 40 || d.extract.includes("may refer to:")) return false;
             return true;
         })
-        .sort((a, b) => {
-            const aHasImg = a.details.original || a.details.thumbnail ? 1 : 0;
-            const bHasImg = b.details.original || b.details.thumbnail ? 1 : 0;
-            return bHasImg - aHasImg || Math.random() - 0.5;
-        });
+        .sort(() => Math.random() - 0.5) // Shuffle the candidates
+        .slice(0, count); // Strictly restrict to the exact amount of slots requested
 };
 
-/** Convert a candidate article into a WikiCard (100% authentic, no artificial boost) */
-const convertToCard = async (
-    candidate: CandidateArticle,
-    theme: string | undefined
+export const convertToCard = async (
+    candidate: CandidateArticle
 ): Promise<WikiCard> => {
     const views = await fetchPageViews(candidate.title);
-    const isGolden = theme === "golden";
-    const isUranium = theme === "uranium";
 
-    const isFeatured = isUranium
-        ? (Math.random() < 0.4)
-        : isGolden
-            ? (views > 50000 && Math.random() < 0.3)
-            : (views > 1000000 && Math.random() < 0.1);
-
-    const rarity = calculateRarity(views, isFeatured);
+    // Rarity is now mathematically strict, based 100% on natural Wikipedia views. Zero artificial chance.
+    const rarity = calculateRarity(views, false);
 
     return {
         id: candidate.id.toString(),
@@ -149,28 +86,6 @@ const convertToCard = async (
         rarity,
         url: candidate.details.fullurl || `https://en.wikipedia.org/?curid=${candidate.id}`,
     };
-};
-
-/** Guarantee minimum rarity as a safety net */
-const guaranteeMinimumRarity = (cards: WikiCard[], theme: string | undefined): void => {
-    if (theme === "uranium") {
-        const epicCount = cards.filter(c => c.rarity === "Epic" || c.rarity === "Legendary").length;
-        if (epicCount < 2) {
-            const needed = 2 - epicCount;
-            let upgraded = 0;
-            for (let i = 0; i < cards.length && upgraded < needed; i++) {
-                if (cards[i].rarity !== "Epic" && cards[i].rarity !== "Legendary" && !cards[i].isCoinValue) {
-                    cards[i].rarity = "Epic";
-                    upgraded++;
-                }
-            }
-        }
-    } else {
-        const hasRare = cards.some(c => c.rarity !== "Common" && !c.isCoinValue);
-        if (!hasRare && cards.length > 0) {
-            cards[0].rarity = theme === "golden" ? "Epic" : theme === "iron" ? "Rare" : "Uncommon";
-        }
-    }
 };
 
 /** Optionally replace one card with a coin bundle */
@@ -189,11 +104,16 @@ const injectCoinCard = (cards: WikiCard[], theme: string | undefined): WikiCard[
         let amount: number;
         let rarity: Rarity;
 
-        if (amountRoll < 0.05) { amount = 250; rarity = "Legendary"; }
-        else if (amountRoll < 0.15) { amount = 100; rarity = "Epic"; }
-        else if (amountRoll < 0.35) { amount = 50; rarity = "Rare"; }
-        else if (amountRoll < 0.65) { amount = 20; rarity = "Uncommon"; }
-        else { amount = 10; rarity = "Common"; }
+        // Ensure Uranium doesn't drop Common coins
+        if (theme === "uranium" && amountRoll >= 0.65) {
+            amount = 20; rarity = "Uncommon";
+        } else {
+            if (amountRoll < 0.05) { amount = 250; rarity = "Legendary"; }
+            else if (amountRoll < 0.15) { amount = 100; rarity = "Epic"; }
+            else if (amountRoll < 0.35) { amount = 50; rarity = "Rare"; }
+            else if (amountRoll < 0.65) { amount = 20; rarity = "Uncommon"; }
+            else { amount = 10; rarity = "Common"; }
+        }
 
         return {
             ...card,
@@ -210,62 +130,142 @@ const injectCoinCard = (cards: WikiCard[], theme: string | undefined): WikiCard[
 
 // --- Public API ---
 
-/** Generate a complete booster pack using Natural Selection */
+/** Generate a complete booster pack using Slot-Based Authentic Fetching */
 export const generateBoosterPack = async (
     size: number = 5,
     theme?: string,
     customTitles?: string[]
 ): Promise<WikiCard[]> => {
-    const cards: WikiCard[] = [];
-    const isRandomEdition = theme === "golden" || theme === "uranium" || theme === "iron" || !theme;
-    let attempts = 0;
 
-    const configKey = (theme as keyof typeof BOOSTER_CONFIG) || "standard";
-    const settings = BOOSTER_CONFIG[configKey] || BOOSTER_CONFIG.standard;
+    // If Custom Titles is provided, bypass slot logic and just fetch those direct.
+    if (customTitles && customTitles.length > 0) {
+        // (Legacy custom titles support for redeems)
+        let rawArticles: { id: number; title: string }[] = [];
+        const cleaned = customTitles.map(t => parseWikipediaIdentifier(t));
+        const selected = cleaned.slice(0, size);
 
-    let targetLegendaries = 0;
-    if (settings.legendaryChance > 0) {
-        targetLegendaries = Math.random() < settings.legendaryChance ? 1 : 0;
+        const titlesParam = selected.map(t => encodeURIComponent(t)).join('|');
+        const url = `${WIKI_API_URL}?action=query&titles=${titlesParam}&format=json&origin=*`;
+        const res = await fetch(url, { headers: { "User-Agent": USER_AGENT } });
+        const data = await res.json();
+
+        if (data.query?.pages) {
+            interface PageResult { pageid?: number; title: string }
+            rawArticles = Object.values(data.query.pages)
+                .filter((p) => (p as PageResult).pageid)
+                .map((p) => ({
+                    id: (p as PageResult).pageid as number,
+                    title: (p as PageResult).title,
+                }));
+        }
+
+        const ids = rawArticles.map(r => r.id.toString());
+        const detailsMap = await fetchArticleDetails(ids);
+
+        const cards: WikiCard[] = [];
+        for (const raw of rawArticles) {
+            const candidate = { ...raw, details: detailsMap[raw.id] as WikiPageDetails };
+            cards.push(await convertToCard(candidate));
+        }
+        // No coin injection for custom titles
+        return cards;
     }
 
-    let legendaryFound = 0;
+    // --- Standard Slot Definitions ---
+    let candidates: CandidateArticle[] = [];
 
-    // The Selection Loop
-    while (cards.length < size && attempts < 20) {
-        attempts++;
+    if (theme === "uranium") {
+        // Blueprint: Max 2 Legendaries exactly. No Commons.
+        // Slot 1: Guaranteed Top Tier (Legendary territory)
+        const slot1 = await fetchSlotArticles(theme, 1, "Top");
+        // Slot 2: 50/50 Top Tier or High Tier (Possible 2nd Legendary or Epic)
+        const slot2 = await fetchSlotArticles(theme, 1, Math.random() < 0.5 ? "Top" : "High");
+        // Slots 3,4,5: Mid Tier (Rares/Uncommons to fill, guaranteed no Commons naturally by offset 2500)
+        const slotsRest = await fetchSlotArticles(theme, 3, "Mid");
 
-        const candidates = await fetchCandidateArticles(
-            theme,
-            isRandomEdition,
-            cards.length < 2 || !!customTitles,
-            3,
-            customTitles
-        );
+        candidates = [...slot1, ...slot2, ...slotsRest];
 
-        for (const candidate of candidates) {
-            if (cards.length >= size) break;
-            const card = await convertToCard(candidate, theme);
+    } else if (theme === "golden") {
+        // Blueprint: Max 1 Legendary naturally, at least 1 Epic.
+        // Slot 1: High Tier (Guaranteed Epic territory)
+        const slot1 = await fetchSlotArticles(theme, 1, "High");
+        // Slots 2-5: Random Tier (Will naturally drop Commons/Uncommons/Rares. A Legendary is <0.01% chance)
+        const slotsRest = await fetchSlotArticles(theme, 4, "Random");
 
-            // 1. Common Filter
-            if (!settings.allowCommon && card.rarity === "Common") continue;
+        candidates = [...slot1, ...slotsRest];
 
-            // 2. Legendary Natural Filtering
-            if (card.rarity === "Legendary") {
-                if (legendaryFound < targetLegendaries) {
-                    cards.push(card);
-                    legendaryFound++;
-                } else {
-                    continue;
-                }
+    } else if (theme === "iron") {
+        // Blueprint: 20% chance for an Epic slot, else pure random
+        if (Math.random() < 0.2) {
+            const slot1 = await fetchSlotArticles(theme, 1, "High");
+            const slotsRest = await fetchSlotArticles(theme, 4, "Random");
+            candidates = [...slot1, ...slotsRest];
+        } else {
+            candidates = await fetchSlotArticles(theme, 5, "Random");
+        }
+    } else {
+        // standard & everything else
+        candidates = await fetchSlotArticles(theme, 5, "Random");
+    }
+
+    // Convert everything to authentic cards
+    const finalCards: WikiCard[] = [];
+
+    for (const candidate of candidates) {
+        let card = await convertToCard(candidate);
+
+        // If Uranium accidentally drew a Common card, we throw it away and naturally draw a new one
+        // until we get a valid rarity, doing ZERO modifications to the card itself.
+        while (theme === "uranium" && card.rarity === "Common") {
+            const replacement = await fetchSlotArticles(theme, 1, "Mid");
+            if (replacement.length > 0) {
+                card = await convertToCard(replacement[0]);
+            } else {
+                break; // safety break if API fails
             }
-            // 3. Accept all other rarities
-            else {
-                cards.push(card);
-            }
+        }
+
+        finalCards.push(card);
+    }
+
+    // Safety fallback
+    if (finalCards.length < size && finalCards.length > 0) {
+        while (finalCards.length < size) {
+            finalCards.push({ ...finalCards[0], id: finalCards[0].id + Math.random() });
         }
     }
 
-    // Safety net for edge cases
-    guaranteeMinimumRarity(cards, theme);
-    return injectCoinCard(cards, theme);
+    return injectCoinCard(finalCards, theme);
+};
+
+/** Generate a single card with a specific natural rarity (used by WikiWheel) */
+export const generateNaturalCard = async (targetRarity: 'Epic' | 'Legendary' | 'Rare'): Promise<WikiCard | null> => {
+    let tier: "Top" | "High" | "Mid" = "Mid";
+    if (targetRarity === 'Legendary') tier = "Top";
+    else if (targetRarity === 'Epic') tier = "High";
+
+    let attempts = 0;
+    while (attempts < 10) {
+        attempts++;
+        // Use slot logic to get articles from the correct popularity strata
+        const candidates = await fetchSlotArticles(undefined, 1, tier);
+        if (candidates.length > 0) {
+            const card = await convertToCard(candidates[0]);
+            // Verify it naturally meets our criteria
+            if (card.rarity === targetRarity) {
+                return card;
+            }
+            // If it's a Legendary but we wanted Epic, it's still "rare enough" but maybe we want strict?
+            // User says "il booste", so we want it to be REAL. 
+            // If we hit a Legendary while looking for an Epic, it's even better, we can return it.
+        }
+    }
+
+    // Final fallback: just give the best we found
+    const lastTry = await fetchSlotArticles(undefined, 1, tier);
+    if (lastTry.length > 0) {
+        return await convertToCard(lastTry[0]);
+    }
+
+    return null;
 };

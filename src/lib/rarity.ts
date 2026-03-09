@@ -9,10 +9,10 @@ import { Rarity } from "../types";
 
 export const calculateRarity = (views: number, isFeatured?: boolean): Rarity => {
     if (isFeatured) return "Legendary";
-    if (views >= 100000) return "Legendary";
-    if (views >= 20000) return "Epic";
-    if (views >= 5000) return "Rare";
-    if (views >= 500) return "Uncommon";
+    if (views >= 500000) return "Legendary";
+    if (views >= 50000) return "Epic";
+    if (views >= 10000) return "Rare";
+    if (views >= 1000) return "Uncommon";
     return "Common";
 };
 

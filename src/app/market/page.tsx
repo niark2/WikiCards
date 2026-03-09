@@ -14,9 +14,9 @@ export default function MarketPage() {
             <div className="fixed top-0 left-1/4 w-[500px] h-[500px] bg-indigo-500/10 blur-[150px] rounded-full pointer-events-none -z-10" />
             <div className="fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-pink-500/5 blur-[150px] rounded-full pointer-events-none -z-10" />
 
-            <div className="max-w-7xl mx-auto px-8 pt-24 w-full">
+            <div className="max-w-7xl mx-auto px-4 md:px-8 pt-20 md:pt-24 w-full">
                 {/* Header Section */}
-                <div className="flex flex-col md:flex-row items-end justify-between gap-12 mb-24 relative">
+                <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6 md:gap-12 mb-12 md:mb-24 relative">
                     <div className="flex flex-col gap-4">
                         <motion.div
                             initial={{ opacity: 0, x: -20 }}
@@ -29,7 +29,7 @@ export default function MarketPage() {
                         <motion.h1
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="text-7xl md:text-8xl font-serif font-black tracking-tighter leading-[0.85]"
+                            className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-serif font-black tracking-tighter leading-[0.85]"
                         >
                             Daily <span className="text-indigo-500/80">Item</span>
                         </motion.h1>
@@ -54,7 +54,7 @@ export default function MarketPage() {
                             <Timer className="w-3 h-3" />
                             Refreshing in
                         </div>
-                        <div className="text-5xl font-black font-mono text-white tracking-[0.2em] tabular-nums">
+                        <div className="text-3xl md:text-5xl font-black font-mono text-white tracking-[0.2em] tabular-nums">
                             {market.timeLeft}
                         </div>
                         <div className="w-full h-0.5 bg-slate-800/30 mt-4 overflow-hidden relative">
@@ -86,7 +86,7 @@ export default function MarketPage() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.3 }}
-                        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-24 pb-40"
+                        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 md:gap-x-12 gap-y-12 md:gap-y-24 pb-20 md:pb-40"
                     >
                         {market.cards.map((card, index) => (
                             <motion.div

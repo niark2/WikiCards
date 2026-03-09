@@ -59,14 +59,14 @@ export default function CraftPage() {
     };
 
     return (
-        <div className="min-h-screen w-full bg-slate-950 text-white relative overflow-x-hidden pt-24 pb-20">
+        <div className="min-h-screen w-full bg-slate-950 text-white relative overflow-x-hidden pt-20 md:pt-24 pb-20">
             {/* Background Effects */}
             <div className="fixed top-0 left-1/4 w-[500px] h-[500px] bg-indigo-500/10 blur-[150px] rounded-full pointer-events-none -z-10" />
             <div className="fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-pink-500/5 blur-[150px] rounded-full pointer-events-none -z-10" />
 
             <div className="max-w-7xl mx-auto px-4 py-8">
                 <div className="mb-12 border-b border-white/5 pb-8">
-                    <h1 className="text-4xl font-serif font-bold text-white mb-2 flex items-center gap-3">
+                    <h1 className="text-2xl md:text-4xl font-serif font-bold text-white mb-2 flex items-center gap-3">
                         <Hammer className="text-amber-500 w-8 h-8" />
                         Card Forging
                     </h1>
@@ -75,7 +75,7 @@ export default function CraftPage() {
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-12 items-start">
                     {/* Left: Input & Info */}
                     <div className="space-y-8">
                         <div className="bg-slate-900/50 border border-white/5 rounded-3xl p-8 shadow-2xl backdrop-blur-sm">

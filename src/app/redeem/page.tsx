@@ -73,7 +73,7 @@ export default function RedeemPage() {
     };
 
     return (
-        <div className="min-h-screen w-full bg-slate-950 text-white relative overflow-x-hidden pt-32 pb-20 flex flex-col items-center">
+        <div className="min-h-screen w-full bg-slate-950 text-white relative overflow-x-hidden pt-20 md:pt-32 pb-20 flex flex-col items-center">
             {/* Background Effects */}
             <div className="fixed top-0 left-1/4 w-[500px] h-[500px] bg-indigo-500/10 blur-[150px] rounded-full pointer-events-none -z-10" />
             <div className="fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-pink-500/5 blur-[150px] rounded-full pointer-events-none -z-10" />
@@ -87,7 +87,7 @@ export default function RedeemPage() {
                     <div className="w-20 h-20 bg-indigo-500/20 rounded-3xl flex items-center justify-center mx-auto mb-6 border border-indigo-500/30 shadow-[0_0_30px_rgba(79,70,229,0.2)]">
                         <Ticket className="w-10 h-10 text-indigo-400" />
                     </div>
-                    <h1 className="text-4xl md:text-5xl font-serif font-bold text-white mb-4">
+                    <h1 className="text-3xl md:text-4xl lg:text-5xl font-serif font-bold text-white mb-4">
                         Redeem Rewards
                     </h1>
                     <p className="text-slate-400 text-lg">
@@ -95,7 +95,7 @@ export default function RedeemPage() {
                     </p>
                 </motion.div>
 
-                <div className="bg-slate-900/50 border border-white/5 rounded-[2.5rem] p-8 md:p-12 shadow-2xl backdrop-blur-xl relative overflow-hidden group">
+                <div className="bg-slate-900/50 border border-white/5 rounded-2xl md:rounded-[2.5rem] p-5 md:p-8 lg:p-12 shadow-2xl backdrop-blur-xl relative overflow-hidden group">
                     <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent opacity-50" />
 
                     <div className="relative space-y-6">

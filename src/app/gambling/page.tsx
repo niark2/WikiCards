@@ -4,7 +4,6 @@ import { useState, useRef } from "react";
 import { motion, AnimatePresence, useAnimation } from "framer-motion";
 import { Coins, Trophy, AlertCircle, RefreshCw, Zap, Star, Gift, HelpCircle, Dices, CircleOff } from "lucide-react";
 import { useCoins } from "@/hooks/useCoins";
-import { generateBoosterPack } from "@/lib/wiki";
 import { saveCollection, logActivity } from "@/lib/storage";
 import { Card } from "@/components/Card";
 import { WikiCard } from "@/types";
@@ -102,13 +101,13 @@ export default function GamblingPage() {
             const roll = Math.random();
             const rarity = roll > 0.80 ? 'Legendary' : 'Epic'; // 80% Epic, 20% Legendary
 
-            const pack = await generateBoosterPack(1);
-            if (pack && pack.length > 0) {
-                const card = pack[0];
-                card.rarity = rarity as any;
+            const { generateNaturalCard } = await import("@/lib/wiki/booster");
+            const card = await generateNaturalCard(rarity as 'Epic' | 'Legendary');
+
+            if (card) {
                 saveCollection([card]);
                 setWonCard(card);
-                setResult({ ...reward, value: rarity, label: `CARTE ${rarity === 'Epic' ? 'ÉPIQUE' : 'LÉGENDE'}` });
+                setResult({ ...reward, value: card.rarity, label: `CARTE ${card.rarity === 'Epic' ? 'ÉPIQUE' : 'LÉGENDE'}` });
                 logActivity('card_bought', `Won ${card.rarity} card: ${card.title} from WikiWheel`, 0);
             }
         }
@@ -195,7 +194,7 @@ export default function GamblingPage() {
                         <button
                             onClick={handleSpin}
                             disabled={isSpinning}
-                            className="mt-8 group relative flex items-center gap-3 px-8 py-4 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white rounded-2xl font-black text-xl uppercase tracking-widest transition-all shadow-lg active:scale-95"
+                            className="mt-6 md:mt-8 group relative flex items-center gap-2 md:gap-3 px-6 md:px-8 py-3 md:py-4 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white rounded-2xl font-black text-base md:text-xl uppercase tracking-widest transition-all shadow-lg active:scale-95"
                         >
                             {isSpinning ? (
                                 <RefreshCw className="w-6 h-6 animate-spin" />
@@ -239,7 +238,7 @@ export default function GamblingPage() {
                 </div>
 
                 {/* Simplified Legend */}
-                <div className="mt-12 grid grid-cols-2 lg:grid-cols-4 gap-3">
+                <div className="mt-8 md:mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                     <div className="p-4 bg-slate-900/40 rounded-2xl border border-white/5 flex items-center gap-3">
                         <div className="w-10 h-10 shrink-0 rounded-xl flex items-center justify-center border border-slate-500/20 bg-slate-500/10 text-slate-500">
                             <CircleOff className="w-5 h-5" />
