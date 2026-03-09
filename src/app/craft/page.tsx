@@ -16,7 +16,7 @@ export default function CraftPage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
-    const { deductCoins, addCoins } = useCoins();
+    const { deductCoins } = useCoins();
 
     const handlePreview = async () => {
         if (!url) return;

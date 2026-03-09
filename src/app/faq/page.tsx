@@ -6,8 +6,6 @@ import {
     HelpCircle,
     Zap,
     Coins,
-    Hammer,
-    ShieldCheck,
     Layers,
     TrendingUp,
     ChevronDown

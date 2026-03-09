@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import { motion, AnimatePresence, useAnimation } from "framer-motion";
-import { Coins, Trophy, AlertCircle, RefreshCw, Zap, Star, Gift, HelpCircle, Dices, CircleOff } from "lucide-react";
+import { Coins, Trophy, AlertCircle, RefreshCw, Star, Dices, CircleOff } from "lucide-react";
 import { useCoins } from "@/hooks/useCoins";
 import { saveCollection, logActivity } from "@/lib/storage";
 import { Card } from "@/components/Card";
@@ -27,7 +27,7 @@ const REWARDS: Reward[] = [
 ];
 
 export default function GamblingPage() {
-    const { coins, addCoins, deductCoins } = useCoins();
+    const { addCoins, deductCoins } = useCoins();
     const [isSpinning, setIsSpinning] = useState(false);
     const [rotation, setRotation] = useState(0);
     const [result, setResult] = useState<Reward | null>(null);

@@ -97,7 +97,7 @@ export default function Home() {
             <div className="relative z-10">
               <Zap className="w-8 h-8 text-blue-400 mb-4" />
               <h3 className="text-2xl font-bold text-slate-100 mb-2">Real-Time Rarity</h3>
-              <p className="text-slate-400">Rarity isn't arbitrary. It's calculated using live monthly pageview data from the Wikipedia API.</p>
+              <p className="text-slate-400">Rarity isn&apos;t arbitrary. It&apos;s calculated using live monthly pageview data from the Wikipedia API.</p>
             </div>
           </div>
 
