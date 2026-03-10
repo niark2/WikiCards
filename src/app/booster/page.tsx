@@ -5,14 +5,16 @@ import { motion } from "framer-motion";
 import { useBoosterPack, BoosterTheme } from "./_hooks/useBoosterPack";
 import { useSound } from "@/hooks/useSound";
 import { BoosterSachet, LoadingSpinner } from "./_components/BoosterSachet";
-import { ThemeSelector, OpenButton } from "./_components/BoosterControls";
+import { OpenButton } from "./_components/BoosterControls";
 import { CardCarousel } from "./_components/CardCarousel";
-import { Sparkles, Shield, Scroll, Atom, Palette, Trophy, Zap, Flag, Ghost } from "lucide-react";
+import { Sparkles, Shield, Scroll, Atom, Palette, Trophy, Zap, Flag, Ghost, Hammer } from "lucide-react";
 
 function ThemeIcon({ theme, className = "", style = {} }: { theme: BoosterTheme, className?: string, style?: React.CSSProperties }) {
     const iconName = theme.icon || "Sparkles";
 
     switch (iconName) {
+        case "Hammer":
+        case "hammer": return <Hammer className={className} style={style} />;
         case "Shield": return <Shield className={className} style={style} />;
         case "Scroll": return <Scroll className={className} style={style} />;
         case "Atom": return <Atom className={className} style={style} />;
@@ -140,47 +142,6 @@ export default function BoosterPage() {
                                 ))}
                             </div>
 
-                            {/* Thematic Category */}
-                            <div className="flex flex-col gap-1">
-                                <div className="flex items-center gap-2 px-2 mb-0.5">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-slate-500" />
-                                    <span className="text-[7px] font-black tracking-[0.4em] text-slate-500 uppercase">Thematic Editions</span>
-                                </div>
-                                {booster.availableThemes.filter(t => t.category === 'thematic').map((theme: BoosterTheme) => (
-                                    <button
-                                        key={theme.id}
-                                        onClick={() => booster.setSelectedThemeId(theme.id)}
-                                        className={`
-                                            group relative w-full p-2.5 rounded-xl transition-all duration-300 flex items-center gap-3 border text-left
-                                            ${booster.selectedThemeId === theme.id
-                                                ? 'bg-white/5 border-white/20 shadow-lg'
-                                                : 'bg-transparent border-transparent hover:bg-white/5 text-slate-500 hover:text-slate-300'
-                                            }
-                                        `}
-                                    >
-                                        <div
-                                            className="w-8 h-8 rounded-lg flex items-center justify-center border transition-transform group-hover:scale-105"
-                                            style={{ backgroundColor: `${theme.color}15`, borderColor: `${theme.color}30` }}
-                                        >
-                                            <ThemeIcon theme={theme} className="w-4 h-4" style={{ color: theme.color }} />
-                                        </div>
-                                        <div className="flex flex-col">
-                                            <span className={`text-[12px] font-black uppercase tracking-[0.2em] ${booster.selectedThemeId === theme.id ? 'text-white' : ''}`}>
-                                                {theme.label.replace(' Edition', '')}
-                                            </span>
-                                            {theme.description && (
-                                                <span className="text-[9px] font-bold text-slate-400">{theme.description}</span>
-                                            )}
-                                        </div>
-                                        {booster.selectedThemeId === theme.id && (
-                                            <motion.div
-                                                layoutId="active-booster"
-                                                className="absolute right-3 w-1 h-1 rounded-full bg-white shadow-[0_0_8px_white]"
-                                            />
-                                        )}
-                                    </button>
-                                ))}
-                            </div>
 
                             {/* Ephemeral Category */}
                             <div className="flex flex-col gap-1">

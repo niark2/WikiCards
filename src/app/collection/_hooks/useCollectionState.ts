@@ -22,6 +22,7 @@ export function useCollectionState() {
     const [cardSelectionMode, setCardSelectionMode] = useState(false);
     const [selectedCardIds, setSelectedCardIds] = useState<string[]>([]);
     const [filter, setFilter] = useState<Rarity | "All">("All");
+    const [searchQuery, setSearchQuery] = useState("");
     const [activePlaylist, setActivePlaylist] = useState<string | "None">("None");
     const [addingToPlaylistCard, setAddingToPlaylistCard] = useState<string | null>(null);
     const [displayLimit, setDisplayLimit] = useState(12);
@@ -65,9 +66,10 @@ export function useCollectionState() {
         return cards.filter(c => {
             const passRarity = filter === "All" || c.rarity === filter;
             const passPlaylist = activePlaylist === "None" || (playlists.find(p => p.id === activePlaylist)?.cardIds.includes(c.id));
-            return passRarity && passPlaylist;
+            const passSearch = searchQuery.trim() === "" || c.title.toLowerCase().includes(searchQuery.trim().toLowerCase());
+            return passRarity && passPlaylist && passSearch;
         });
-    }, [cards, filter, activePlaylist, playlists]);
+    }, [cards, filter, activePlaylist, playlists, searchQuery]);
 
     const groupedCards = useMemo(() => {
         const groups: Record<string, CardGroup> = {};
@@ -163,6 +165,38 @@ export function useCollectionState() {
             logActivity('folder_created', `Created folder "${name.trim()}"`);
         }
     }, [playlists]);
+
+    const handleDeletePlaylist = useCallback((playlistId: string) => {
+        const playlist = playlists.find(p => p.id === playlistId);
+        if (!playlist) return;
+
+        if (confirm(`Are you sure you want to delete the folder "${playlist.name}"? The cards will remain in your collection.`)) {
+            const newPlaylists = playlists.filter(p => p.id !== playlistId);
+            savePlaylists(newPlaylists);
+            setPlaylists(newPlaylists);
+            if (activePlaylist === playlistId) {
+                setActivePlaylistAndReset("None");
+            }
+            logActivity('folder_deleted', `Deleted folder "${playlist.name}"`);
+            showToast(`🗑️ Folder "${playlist.name}" deleted`, "success");
+        }
+    }, [playlists, activePlaylist, setActivePlaylistAndReset, showToast]);
+
+    const handleRenamePlaylist = useCallback((playlistId: string) => {
+        const playlist = playlists.find(p => p.id === playlistId);
+        if (!playlist) return;
+
+        const newName = prompt("Enter new name for folder:", playlist.name);
+        if (newName && newName.trim() && newName.trim() !== playlist.name) {
+            const newPlaylists = playlists.map(p =>
+                p.id === playlistId ? { ...p, name: newName.trim() } : p
+            );
+            savePlaylists(newPlaylists);
+            setPlaylists(newPlaylists);
+            logActivity('folder_renamed', `Renamed folder from "${playlist.name}" to "${newName.trim()}"`);
+            showToast(`✏️ Folder renamed to "${newName.trim()}"`, "success");
+        }
+    }, [playlists, showToast]);
 
     const handleAddToPlaylist = useCallback((playlistId: string, cardId: string) => {
         const newPlaylists = playlists.map(p => {
@@ -302,6 +336,8 @@ export function useCollectionState() {
         // UI State
         filter,
         setFilter: setFilterAndReset,
+        searchQuery,
+        setSearchQuery,
         sortBy,
         setSortBy,
         activePlaylist,
@@ -318,6 +354,8 @@ export function useCollectionState() {
         handleBatchAddToPlaylist,
         toggleCardSelection,
         handleCreatePlaylist,
+        handleDeletePlaylist,
+        handleRenamePlaylist,
         handleAddToPlaylist,
         handleRemoveFromPlaylist,
         toggleSelectionMode,

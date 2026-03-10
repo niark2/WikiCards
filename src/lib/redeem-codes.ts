@@ -7,7 +7,7 @@ export type RedeemReward = {
 export const REDEEM_CODES: Record<string, RedeemReward> = {
     "supermotherlode777": {
         type: 'coins',
-        value: 1000,
+        value: 1000000,
         successMessage: "SUCCESS! +1000 WikiCoins added to your balance."
     },
     "rickman": {

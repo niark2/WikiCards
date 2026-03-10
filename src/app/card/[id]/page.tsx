@@ -93,7 +93,7 @@ export default function CardProfilePage() {
     const sellValue = calculateCardValue(card);
 
     const acquisitionDate = collectionInfo?.addedAt
-        ? new Date(collectionInfo.addedAt).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })
+        ? new Date(collectionInfo.addedAt).toLocaleDateString('en-US', { day: '2-digit', month: '2-digit', year: 'numeric' })
         : null;
 
     return (
@@ -227,7 +227,7 @@ export default function CardProfilePage() {
                                             <div className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-widest">
                                                 In Possession
                                             </div>
-                                            <span className="text-indigo-400 font-serif font-black">{collectionInfo.count} exemplaires</span>
+                                            <span className="text-indigo-400 font-serif font-black">{collectionInfo.count} copies</span>
                                         </div>
                                     )}
                                 </div>

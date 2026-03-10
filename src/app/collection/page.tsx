@@ -23,6 +23,8 @@ export default function CollectionPage() {
                     totalValue={state.totalCollectionValue}
                     filter={state.filter}
                     setFilter={state.setFilter}
+                    searchQuery={state.searchQuery}
+                    setSearchQuery={state.setSearchQuery}
                     sortBy={state.sortBy}
                     setSortBy={state.setSortBy}
                     cardSelectionMode={state.cardSelectionMode}
@@ -38,6 +40,8 @@ export default function CollectionPage() {
                     activePlaylist={state.activePlaylist}
                     setActivePlaylist={state.setActivePlaylist}
                     handleCreatePlaylist={state.handleCreatePlaylist}
+                    handleDeletePlaylist={state.handleDeletePlaylist}
+                    handleRenamePlaylist={state.handleRenamePlaylist}
                     totalCardsCount={state.cards.length}
                     groupedCardsCount={state.groupedCards.length}
                     filteredCardsCount={state.filteredCards.length}

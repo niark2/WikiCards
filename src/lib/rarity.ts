@@ -122,3 +122,19 @@ export const calculateCardValue = (card: { rarity: Rarity, views: number, imageU
     // Return floor value, bounded between 5 and 5000
     return Math.min(5000, Math.max(5, Math.floor(value)));
 };
+
+/**
+ * Calculates a logical craft cost for a card.
+ * Based on the discard value and a multiplier depending on rarity.
+ */
+export const calculateCraftCost = (card: { rarity: Rarity, views: number, imageUrl?: string | null, extract?: string, title?: string, wikiId?: string }): number => {
+    const discardValue = calculateCardValue(card);
+    const multipliers: Record<Rarity, number> = {
+        Common: 2,
+        Uncommon: 3,
+        Rare: 4,
+        Epic: 6,
+        Legendary: 8,
+    };
+    return Math.floor(discardValue * multipliers[card.rarity]);
+};

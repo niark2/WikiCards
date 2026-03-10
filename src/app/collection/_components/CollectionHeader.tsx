@@ -1,7 +1,7 @@
 "use client";
 
 import { Rarity } from "@/types";
-import { Layers, Calendar, Download, Upload } from "lucide-react";
+import { Layers, Calendar, Download, Upload, Search } from "lucide-react";
 import { SortOption } from "../_hooks/useCollectionState";
 
 interface CollectionHeaderProps {
@@ -10,6 +10,8 @@ interface CollectionHeaderProps {
     totalValue: number;
     filter: Rarity | "All";
     setFilter: (filter: Rarity | "All") => void;
+    searchQuery: string;
+    setSearchQuery: (query: string) => void;
     sortBy: SortOption;
     setSortBy: (sort: SortOption) => void;
     cardSelectionMode: boolean;
@@ -28,6 +30,8 @@ export function CollectionHeader({
     totalValue,
     filter,
     setFilter,
+    searchQuery,
+    setSearchQuery,
     sortBy,
     setSortBy,
     cardSelectionMode,
@@ -123,6 +127,18 @@ export function CollectionHeader({
                     >
                         {cardSelectionMode ? 'Cancel Selection' : 'Multi-Select Mode'}
                     </button>
+
+                    {/* Search Bar */}
+                    <div className="relative w-full md:w-auto mt-2 md:mt-0 md:ml-auto">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                        <input
+                            type="text"
+                            placeholder="Search cards..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full md:w-64 bg-slate-800/50 border border-white/5 text-sm text-white placeholder:text-slate-500 rounded-full pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
+                        />
+                    </div>
                 </div>
             </div>
         </div>

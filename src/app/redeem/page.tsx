@@ -26,7 +26,7 @@ export default function RedeemPage() {
             const alreadyRedeemed = getRedeemedCodes();
             if (alreadyRedeemed.includes(normalizedCode)) {
                 setStatus({ type: 'error', message: "This code has already been redeemed." });
-                showToast("❌ Code déjà utilisé", "error");
+                showToast("❌ Code already used", "error");
                 return;
             }
 
@@ -41,7 +41,7 @@ export default function RedeemPage() {
                         type: 'success',
                         message: reward.successMessage || `SUCCESS! +${amount} WikiCoins added to your balance.`
                     });
-                    showToast(`🎉 Code valide ! +${amount} WikiCoins`, "success");
+                    showToast(`🎉 Valid code! +${amount} WikiCoins`, "success");
                 } else if (reward.type === 'card') {
                     const articleIdentifier = reward.value as string;
                     const title = parseWikipediaIdentifier(articleIdentifier);
@@ -55,7 +55,7 @@ export default function RedeemPage() {
                             type: 'success',
                             message: reward.successMessage || `SUCCESS! You received a special card: ${cardData.title}!`
                         });
-                        showToast(`🎉 Code valide ! Vous avez reçu ${cardData.title}`, "success");
+                        showToast(`🎉 Valid code! You received ${cardData.title}`, "success");
                     } else {
                         setStatus({ type: 'error', message: "Failed to fetch reward card. Please try again later." });
                     }
@@ -63,13 +63,13 @@ export default function RedeemPage() {
                 setCode("");
             } catch {
                 setStatus({ type: 'error', message: "An error occurred during redemption." });
-                showToast("❌ Erreur lors de l'activation", "error");
+                showToast("❌ Error during activation", "error");
             } finally {
                 setLoading(false);
             }
         } else {
             setStatus({ type: 'error', message: "Invalid or expired code." });
-            showToast("❌ Code invalide ou expiré", "error");
+            showToast("❌ Invalid or expired code", "error");
         }
 
         setTimeout(() => {

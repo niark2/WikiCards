@@ -20,16 +20,14 @@ export interface BoosterTheme {
 }
 
 export const THEMES: BoosterTheme[] = [
-    { id: "", label: "Standard Edition", color: "#e2e8f0", dark: "#64748b", light: "#ffffff", category: 'classic', cost: 20, icon: "Sparkles", description: "All categories" },
+    { id: "", label: "Standard Edition", color: "#e2e8f0", dark: "#64748b", light: "#ffffff", category: 'classic', cost: 30, icon: "Sparkles", description: "All categories" },
     { id: "iron", label: "Iron Edition", color: "#64748b", dark: "#334155", light: "#94a3b8", category: 'classic', cost: 80, icon: "Shield", description: "Tech & Industry" },
-    { id: "history", label: "History Edition", color: "#78350f", dark: "#451a03", light: "#92400e", category: 'thematic', cost: 120, icon: "Scroll", description: "Events & Figures" },
-    { id: "science", label: "Science Edition", color: "#0284c7", dark: "#075985", light: "#38bdf8", category: 'thematic', cost: 120, icon: "Atom", description: "Knowledge & Discovery" },
-    { id: "art", label: "Art Edition", color: "#9333ea", dark: "#581c87", light: "#c084fc", category: 'thematic', cost: 120, icon: "Palette", description: "Creativity & Works" },
-    { id: "golden", label: "Golden Edition", color: "#eab308", dark: "#b45309", light: "#fde047", category: 'classic', cost: 200, icon: "Trophy", description: "Rare cards guaranteed" },
-    { id: "uranium", label: "Uranium Edition", color: "#22c55e", dark: "#14532d", light: "#4ade80", category: 'classic', cost: 450, icon: "Zap", description: "100% Epic or higher" },
+
+    { id: "golden", label: "Golden Edition", color: "#eab308", dark: "#b45309", light: "#fde047", category: 'classic', cost: 300, icon: "Trophy", description: "Rare cards guaranteed" },
+    { id: "uranium", label: "Uranium Edition", color: "#22c55e", dark: "#14532d", light: "#4ade80", category: 'classic', cost: 900, icon: "Zap", description: "100% Epic or higher" },
 ];
 
-const FREE_LIMIT = 5;
+const FREE_LIMIT = 3;
 
 export function useBoosterPack() {
     const [loading, setLoading] = useState(false);
@@ -82,7 +80,7 @@ export function useBoosterPack() {
     const openBooster = useCallback(async () => {
         // Pre-check balance without deducting yet
         if (cost > 0 && coins < cost) {
-            showToast("❌ Pas assez de WikiCoins !", "error");
+            showToast("❌ Not enough WikiCoins!", "error");
             return;
         }
 
@@ -105,7 +103,7 @@ export function useBoosterPack() {
                 if (cost > 0) {
                     const success = deductCoins(cost);
                     if (!success) {
-                        showToast("❌ Pas assez de WikiCoins !", "error");
+                        showToast("❌ Not enough WikiCoins!", "error");
                         setLoading(false);
                         return;
                     }
@@ -130,7 +128,7 @@ export function useBoosterPack() {
                     if (c.isCoinValue) {
                         addCoins(c.isCoinValue);
                         logActivity('coins_added', `Found ${c.isCoinValue} WikiCoins in a booster`, c.isCoinValue);
-                        showToast(`💰 Vous avez trouvé ${c.isCoinValue} WikiCoins !`, "success");
+                        showToast(`💰 You found ${c.isCoinValue} WikiCoins!`, "success");
                     }
                 });
 
@@ -140,7 +138,7 @@ export function useBoosterPack() {
             }
         } catch (e) {
             console.error(e);
-            showToast("❌ Erreur lors de l'ouverture du booster", "error");
+            showToast("❌ Error opening booster", "error");
         } finally {
             setLoading(false);
         }

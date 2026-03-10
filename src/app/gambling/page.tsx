@@ -10,7 +10,7 @@ import { saveCollection, logActivity } from "@/lib/storage";
 import { Card } from "@/components/Card";
 import { WikiCard } from "@/types";
 
-const SPIN_COST = 80;
+const SPIN_COST = 100;
 
 interface Reward {
     id: number;
@@ -22,9 +22,9 @@ interface Reward {
 }
 
 const REWARDS: Reward[] = [
-    { id: 0, type: 'coins', label: "PERDU", value: 0, chance: 0.45, color: "#1e293b" },
-    { id: 1, type: 'coins', label: "GAIN PIÈCES", value: 250, chance: 0.30, color: "#6366f1" },
-    { id: 2, type: 'card', label: "CARTE RARE", value: "Epic", chance: 0.20, color: "#ec4899" },
+    { id: 0, type: 'coins', label: "LOST", value: 0, chance: 0.45, color: "#1e293b" },
+    { id: 1, type: 'coins', label: "WON COINS", value: 250, chance: 0.35, color: "#6366f1" },
+    { id: 2, type: 'card', label: "CARD", value: "Card", chance: 0.15, color: "#ec4899" },
     { id: 3, type: 'coins', label: "JACKPOT", value: 1000, chance: 0.05, color: "#f59e0b" },
 ];
 
@@ -83,7 +83,7 @@ export default function GamblingPage() {
             handleWin(winningReward);
             setIsSpinning(false);
         } else {
-            showToast("❌ Pas assez de WikiCoins !", "error");
+            showToast("❌ Not enough WikiCoins!", "error");
         }
     };
 
@@ -99,33 +99,42 @@ export default function GamblingPage() {
 
             addCoins(amount);
             playCoinSound();
-            setResult({ ...reward, value: amount, label: `${amount} PIÈCES` });
+            setResult({ ...reward, value: amount, label: `${amount} COINS` });
             logActivity('coins_added', `Won ${amount} WikiCoins from WikiWheel`, amount);
-            showToast(`💰 Vous avez gagné ${amount} WikiCoins !`, "success");
+            showToast(`💰 You won ${amount} WikiCoins!`, "success");
 
         } else if (reward.id === 3) { // JACKPOT Quadrant
             addCoins(1000);
             playCoinSound();
             logActivity('coins_added', `Won JACKPOT (1000) from WikiWheel`, 1000);
-            showToast("🎉 JACKPOT ! 1000 WikiCoins !", "success");
+            showToast("🎉 JACKPOT! 1000 WikiCoins!", "success");
 
         } else if (reward.type === 'card') {
             const roll = Math.random();
-            const rarity = roll > 0.80 ? 'Legendary' : 'Epic'; // 80% Epic, 20% Legendary
+            let rarity: 'Rare' | 'Epic' | 'Legendary' = 'Rare';
+            if (roll > 0.95) rarity = 'Legendary';
+            else if (roll > 0.70) rarity = 'Epic';
 
             const { generateNaturalCard } = await import("@/lib/wiki/booster");
-            const card = await generateNaturalCard(rarity as 'Epic' | 'Legendary');
+            const card = await generateNaturalCard(rarity);
 
             if (card) {
                 saveCollection([card]);
                 setWonCard(card);
                 playRevealSound(card.rarity);
-                setResult({ ...reward, value: card.rarity, label: `CARTE ${card.rarity === 'Epic' ? 'ÉPIQUE' : 'LÉGENDE'}` });
+                setResult({ ...reward, value: card.rarity, label: `${card.rarity.toUpperCase()} CARD` });
                 logActivity('card_bought', `Won ${card.rarity} card: ${card.title} from WikiWheel`, 0);
-                showToast(`✨ Vous avez gagné une carte ${card.rarity} !`, "success");
+                showToast(`✨ You won a ${card.rarity} card!`, "success");
             }
         } else if (reward.id === 0) {
-            showToast("😔 Perdu... Réessayez !", "info");
+            if (Math.random() < 0.33) {
+                addCoins(10);
+                playCoinSound();
+                setResult({ ...reward, value: 10, label: "CONSOLATION" });
+                showToast("🎁 Lost... but 10 coins consolation!", "success");
+            } else {
+                showToast("😔 Lost... Try again!", "info");
+            }
         }
     };
 
@@ -140,7 +149,7 @@ export default function GamblingPage() {
                         Wiki<span className="text-indigo-500">Wheel</span>
                     </h1>
                     <p className="text-slate-500 text-[10px] md:text-xs max-w-md mx-auto font-medium uppercase tracking-[0.2em]">
-                        Mise {SPIN_COST} WikiCoins • 4 Quadrants
+                        Bet {SPIN_COST} WikiCoins • 4 Quadrants
                     </p>
                 </div>
 
@@ -215,7 +224,7 @@ export default function GamblingPage() {
                             {isSpinning ? (
                                 <RefreshCw className="w-6 h-6 animate-spin" />
                             ) : (
-                                `JOUER (${SPIN_COST} 🪙)`
+                                `SPIN (${SPIN_COST} 🪙)`
                             )}
                         </button>
                     </div>
@@ -230,7 +239,7 @@ export default function GamblingPage() {
                                     animate={{ opacity: 1, scale: 1 }}
                                     className="flex flex-col items-center text-center p-4 md:p-6 bg-slate-900/40 border border-white/5 rounded-[24px] backdrop-blur-md w-full max-w-sm shadow-2xl"
                                 >
-                                    <h2 className="text-[9px] font-black uppercase tracking-[0.4em] text-slate-500 mb-3">RÉSULTAT</h2>
+                                    <h2 className="text-[9px] font-black uppercase tracking-[0.4em] text-slate-500 mb-3">RESULT</h2>
                                     <div className="text-2xl md:text-3xl font-black mb-4" style={{ color: result.id === 0 ? '#64748b' : result.color }}>
                                         {result.label}
                                     </div>
@@ -246,7 +255,7 @@ export default function GamblingPage() {
                             ) : (
                                 <div className="text-center opacity-10">
                                     <Dices className="w-16 h-16 mx-auto mb-4" />
-                                    <p className="font-serif italic text-lg">Le sort en est jeté...</p>
+                                    <p className="font-serif italic text-lg">The die is cast...</p>
                                 </div>
                             )}
                         </AnimatePresence>
@@ -260,7 +269,8 @@ export default function GamblingPage() {
                             <CircleOff className="w-5 h-5" />
                         </div>
                         <div className="overflow-hidden">
-                            <div className="font-black text-[10px] uppercase truncate">PERDU (45%)</div>
+                            <div className="font-black text-[10px] uppercase truncate">LOST (45%)</div>
+                            <div className="text-[8px] text-slate-500 font-bold uppercase mt-0.5">33% CHANCE 10 COINS</div>
                         </div>
                     </div>
                     <div className="p-4 bg-slate-900/40 rounded-2xl border border-white/5 flex items-center gap-3">
@@ -268,8 +278,8 @@ export default function GamblingPage() {
                             <Coins className="w-5 h-5" />
                         </div>
                         <div className="overflow-hidden">
-                            <div className="font-black text-[10px] uppercase truncate">PIÈCES (30%)</div>
-                            <div className="text-[8px] text-slate-500 font-bold uppercase">50 (60%) • 100 (30%) • 200 (10%)</div>
+                            <div className="font-black text-[10px] uppercase truncate">COINS (35%)</div>
+                            <div className="text-[8px] text-slate-500 font-bold uppercase mt-0.5">50 (60%) • 100 (30%) • 200 (10%)</div>
                         </div>
                     </div>
                     <div className="p-4 bg-slate-900/40 rounded-2xl border border-white/5 flex items-center gap-3">
@@ -277,8 +287,8 @@ export default function GamblingPage() {
                             <Star className="w-5 h-5" />
                         </div>
                         <div className="overflow-hidden">
-                            <div className="font-black text-[10px] uppercase truncate">CARTES (20%)</div>
-                            <div className="text-[8px] text-slate-500 font-bold uppercase">ÉPIQUE (80%) • LÉGENDE (20%)</div>
+                            <div className="font-black text-[10px] uppercase truncate">CARDS (15%)</div>
+                            <div className="text-[8px] text-slate-500 font-bold uppercase mt-0.5">RARE (70%) • EPIC (25%) • LEG (5%)</div>
                         </div>
                     </div>
                     <div className="p-4 bg-slate-900/40 rounded-2xl border border-white/5 flex items-center gap-3">
@@ -287,7 +297,7 @@ export default function GamblingPage() {
                         </div>
                         <div className="overflow-hidden">
                             <div className="font-black text-[10px] uppercase truncate">JACKPOT (5%)</div>
-                            <div className="text-[8px] text-slate-500 font-bold uppercase">1000 PIÈCES FIXE</div>
+                            <div className="text-[8px] text-slate-500 font-bold uppercase">1000 COINS FIXED</div>
                         </div>
                     </div>
                 </div>

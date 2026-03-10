@@ -3,7 +3,7 @@ import { safeGetJSON, safeSetJSON, isClientSide } from "./safe-storage";
 
 export interface ActivityLog {
     id: string;
-    type: 'booster_opened' | 'card_sold' | 'folder_created' | 'coins_added' | 'card_crafted' | 'card_bought' | 'collection_exported' | 'collection_imported' | 'code_redeemed';
+    type: 'booster_opened' | 'card_sold' | 'folder_created' | 'folder_deleted' | 'folder_renamed' | 'coins_added' | 'card_crafted' | 'card_bought' | 'collection_exported' | 'collection_imported' | 'code_redeemed';
     message: string;
     amount?: number;
     timestamp: number;
@@ -48,11 +48,45 @@ export const incrementDailyBooster = (): void => {
     safeSetJSON(DAILY_BOOSTER_KEY, newInfo);
 };
 
+const DAILY_CRAFT_KEY = "wikicards_daily_craft";
+
+export interface DailyCraftInfo {
+    count: number;
+    lastReset: string;
+}
+
+export const getDailyCraftInfo = (): DailyCraftInfo => {
+    const defaultInfo: DailyCraftInfo = { count: 0, lastReset: new Date().toISOString() };
+    if (!isClientSide()) return defaultInfo;
+
+    const info = safeGetJSON<DailyCraftInfo | null>(DAILY_CRAFT_KEY, null);
+    const today = new Date().toDateString();
+
+    if (info) {
+        const lastResetDate = new Date(info.lastReset).toDateString();
+        if (today === lastResetDate) {
+            return info;
+        }
+    }
+
+    return defaultInfo;
+};
+
+export const incrementDailyCraft = (): void => {
+    if (!isClientSide()) return;
+    const info = getDailyCraftInfo();
+    const newInfo: DailyCraftInfo = {
+        count: info.count + 1,
+        lastReset: new Date().toISOString()
+    };
+    safeSetJSON(DAILY_CRAFT_KEY, newInfo);
+};
+
 const WIKICARD_DEFAULT: WikiCard = {
     id: 'wikicard-starter',
     wikiId: 'wikicard',
     title: 'WikiCard',
-    extract: 'Ceci est la carte collector officielle de WikiCards ! Elle n\'a aucune valeur financière mais témoigne de votre début dans l\'aventure.',
+    extract: 'This is the official WikiCards collector card! It has no financial value but stands as a testament to the beginning of your adventure.',
     imageUrl: '/wikicard.png',
     views: 0,
     rarity: 'Common',
