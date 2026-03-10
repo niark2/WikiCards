@@ -1,14 +1,49 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { useBoosterPack, BoosterTheme } from "./_hooks/useBoosterPack";
 import { BoosterSachet, LoadingSpinner } from "./_components/BoosterSachet";
 import { ThemeSelector, OpenButton } from "./_components/BoosterControls";
 import { CardCarousel } from "./_components/CardCarousel";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Shield, Scroll, Atom, Palette, Trophy, Zap, Flag, Ghost } from "lucide-react";
+
+function ThemeIcon({ theme, className = "", style = {} }: { theme: BoosterTheme, className?: string, style?: any }) {
+    const iconName = theme.icon || "Sparkles";
+
+    switch (iconName) {
+        case "Shield": return <Shield className={className} style={style} />;
+        case "Scroll": return <Scroll className={className} style={style} />;
+        case "Atom": return <Atom className={className} style={style} />;
+        case "Palette": return <Palette className={className} style={style} />;
+        case "Trophy": return <Trophy className={className} style={style} />;
+        case "Zap": return <Zap className={className} style={style} />;
+        case "Flag": return <Flag className={className} style={style} />;
+        case "Ghost": return <Ghost className={className} style={style} />;
+        case "Sparkles":
+        default:
+            return <Sparkles className={className} style={style} />;
+    }
+}
 
 export default function BoosterPage() {
     const booster = useBoosterPack();
+    const [isTearing, setIsTearing] = useState(false);
+
+    const handleOpenBooster = async () => {
+        if (booster.cost > 0 && booster.coins < booster.cost) {
+            alert("Not enough WikiCoins! Discard cards in your collection to get more.");
+            return;
+        }
+
+        if (isTearing || booster.loading) return;
+
+        setIsTearing(true);
+        setTimeout(() => {
+            setIsTearing(false);
+            booster.openBooster();
+        }, 1200);
+    };
 
     return (
         <div className="flex flex-col md:flex-row min-h-[calc(100vh-4rem)] relative w-full overflow-hidden bg-slate-950 items-stretch">
@@ -21,7 +56,7 @@ export default function BoosterPage() {
                     <motion.div
                         initial={{ opacity: 0, x: -50 }}
                         animate={{ opacity: 1, x: 0 }}
-                        className="w-full md:w-64 bg-slate-900/40 backdrop-blur-2xl border-b md:border-b-0 md:border-r border-white/5 p-3 md:p-4 flex md:flex-col gap-3 md:gap-6 z-20 overflow-x-auto md:overflow-x-visible md:overflow-y-auto md:min-h-full"
+                        className="w-full md:w-72 bg-slate-900/40 backdrop-blur-2xl border-b md:border-b-0 md:border-r border-white/5 p-3 md:p-5 flex md:flex-col gap-3 md:gap-7 z-20 overflow-x-auto md:overflow-x-visible md:overflow-y-auto md:min-h-full"
                     >
                         {/* Title — hidden on mobile, shown on desktop */}
                         <div className="hidden md:flex flex-col gap-1.5 text-left">
@@ -45,8 +80,15 @@ export default function BoosterPage() {
                                         }
                                     `}
                                 >
-                                    <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: theme.color }} />
-                                    {theme.label.replace(' Edition', '')}
+                                    <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center shrink-0 border border-white/10">
+                                        <ThemeIcon theme={theme} className="w-4 h-4" style={{ color: theme.color }} />
+                                    </div>
+                                    <div className="flex flex-col items-start gap-0.5">
+                                        <span className="text-[10px] font-black uppercase tracking-wider">{theme.label.replace(' Edition', '')}</span>
+                                        {theme.description && (
+                                            <span className="text-[8px] font-bold text-slate-400 capitalize leading-none">{theme.description}</span>
+                                        )}
+                                    </div>
                                 </button>
                             ))}
                         </div>
@@ -54,7 +96,7 @@ export default function BoosterPage() {
                         {/* Desktop: categorized list */}
                         <div className="hidden md:flex flex-col gap-6">
                             {/* Classic Category */}
-                            <div className="flex flex-col gap-1.5">
+                            <div className="flex flex-col gap-1">
                                 <div className="flex items-center gap-2 px-2 mb-0.5">
                                     <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
                                     <span className="text-[7px] font-black tracking-[0.4em] text-indigo-500 uppercase">Classic Editions</span>
@@ -64,7 +106,7 @@ export default function BoosterPage() {
                                         key={theme.id}
                                         onClick={() => booster.setSelectedThemeId(theme.id)}
                                         className={`
-                                            group relative w-full p-2 rounded-lg transition-all duration-300 flex items-center gap-2.5 border text-left
+                                            group relative w-full p-2.5 rounded-xl transition-all duration-300 flex items-center gap-3 border text-left
                                             ${booster.selectedThemeId === theme.id
                                                 ? 'bg-white/5 border-white/20 shadow-lg'
                                                 : 'bg-transparent border-transparent hover:bg-white/5 text-slate-500 hover:text-slate-300'
@@ -72,17 +114,17 @@ export default function BoosterPage() {
                                         `}
                                     >
                                         <div
-                                            className="w-7 h-7 rounded-md flex items-center justify-center border transition-transform group-hover:scale-105"
+                                            className="w-8 h-8 rounded-lg flex items-center justify-center border transition-transform group-hover:scale-105"
                                             style={{ backgroundColor: `${theme.color}15`, borderColor: `${theme.color}30` }}
                                         >
-                                            <Sparkles className="w-3.5 h-3.5" style={{ color: theme.color }} />
+                                            <ThemeIcon theme={theme} className="w-4 h-4" style={{ color: theme.color }} />
                                         </div>
                                         <div className="flex flex-col">
-                                            <span className={`text-[11px] font-black uppercase tracking-[0.2em] ${booster.selectedThemeId === theme.id ? 'text-white' : ''}`}>
+                                            <span className={`text-[12px] font-black uppercase tracking-[0.2em] ${booster.selectedThemeId === theme.id ? 'text-white' : ''}`}>
                                                 {theme.label.replace(' Edition', '')}
                                             </span>
-                                            {theme.id === "" && (
-                                                <span className="text-[9px] font-bold opacity-50">All categories</span>
+                                            {theme.description && (
+                                                <span className="text-[9px] font-bold text-slate-400">{theme.description}</span>
                                             )}
                                         </div>
                                         {booster.selectedThemeId === theme.id && (
@@ -96,7 +138,7 @@ export default function BoosterPage() {
                             </div>
 
                             {/* Thematic Category */}
-                            <div className="flex flex-col gap-1.5">
+                            <div className="flex flex-col gap-1">
                                 <div className="flex items-center gap-2 px-2 mb-0.5">
                                     <div className="w-1.5 h-1.5 rounded-full bg-slate-500" />
                                     <span className="text-[7px] font-black tracking-[0.4em] text-slate-500 uppercase">Thematic Editions</span>
@@ -106,7 +148,7 @@ export default function BoosterPage() {
                                         key={theme.id}
                                         onClick={() => booster.setSelectedThemeId(theme.id)}
                                         className={`
-                                            group relative w-full p-2 rounded-lg transition-all duration-300 flex items-center gap-2.5 border text-left
+                                            group relative w-full p-2.5 rounded-xl transition-all duration-300 flex items-center gap-3 border text-left
                                             ${booster.selectedThemeId === theme.id
                                                 ? 'bg-white/5 border-white/20 shadow-lg'
                                                 : 'bg-transparent border-transparent hover:bg-white/5 text-slate-500 hover:text-slate-300'
@@ -114,15 +156,18 @@ export default function BoosterPage() {
                                         `}
                                     >
                                         <div
-                                            className="w-7 h-7 rounded-md flex items-center justify-center border transition-transform group-hover:scale-105"
+                                            className="w-8 h-8 rounded-lg flex items-center justify-center border transition-transform group-hover:scale-105"
                                             style={{ backgroundColor: `${theme.color}15`, borderColor: `${theme.color}30` }}
                                         >
-                                            <Sparkles className="w-3.5 h-3.5" style={{ color: theme.color }} />
+                                            <ThemeIcon theme={theme} className="w-4 h-4" style={{ color: theme.color }} />
                                         </div>
                                         <div className="flex flex-col">
-                                            <span className={`text-[11px] font-black uppercase tracking-[0.2em] ${booster.selectedThemeId === theme.id ? 'text-white' : ''}`}>
+                                            <span className={`text-[12px] font-black uppercase tracking-[0.2em] ${booster.selectedThemeId === theme.id ? 'text-white' : ''}`}>
                                                 {theme.label.replace(' Edition', '')}
                                             </span>
+                                            {theme.description && (
+                                                <span className="text-[9px] font-bold text-slate-400">{theme.description}</span>
+                                            )}
                                         </div>
                                         {booster.selectedThemeId === theme.id && (
                                             <motion.div
@@ -135,7 +180,7 @@ export default function BoosterPage() {
                             </div>
 
                             {/* Ephemeral Category */}
-                            <div className="flex flex-col gap-1.5">
+                            <div className="flex flex-col gap-1">
                                 <div className="flex items-center gap-2 px-2 mb-0.5">
                                     <div className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
                                     <span className="text-[7px] font-black tracking-[0.4em] text-rose-500 uppercase">Ephemeral</span>
@@ -145,7 +190,7 @@ export default function BoosterPage() {
                                         key={theme.id}
                                         onClick={() => booster.setSelectedThemeId(theme.id)}
                                         className={`
-                                            group relative w-full p-2 rounded-lg transition-all duration-300 flex items-center gap-2.5 border text-left
+                                            group relative w-full p-2.5 rounded-xl transition-all duration-300 flex items-center gap-3 border text-left
                                             ${booster.selectedThemeId === theme.id
                                                 ? 'bg-red-950/20 border-red-500/30 shadow-[0_0_10px_rgba(255,0,0,0.1)]'
                                                 : 'bg-transparent border-transparent hover:bg-white/5 text-slate-500 hover:text-slate-300'
@@ -153,15 +198,18 @@ export default function BoosterPage() {
                                         `}
                                     >
                                         <div
-                                            className="w-7 h-7 rounded-md flex items-center justify-center border transition-transform group-hover:scale-105"
+                                            className="w-8 h-8 rounded-lg flex items-center justify-center border transition-transform group-hover:scale-105"
                                             style={{ backgroundColor: `${theme.color}15`, borderColor: `${theme.color}30` }}
                                         >
-                                            <Sparkles className="w-3.5 h-3.5" style={{ color: theme.color }} />
+                                            <ThemeIcon theme={theme} className="w-4 h-4" style={{ color: theme.color }} />
                                         </div>
                                         <div className="flex flex-col">
-                                            <span className={`text-[11px] font-black uppercase tracking-[0.2em] ${booster.selectedThemeId === theme.id ? 'text-white' : ''}`}>
+                                            <span className={`text-[12px] font-black uppercase tracking-[0.2em] ${booster.selectedThemeId === theme.id ? 'text-white' : ''}`}>
                                                 {theme.label.replace(' Edition', '')}
                                             </span>
+                                            {theme.description && (
+                                                <span className="text-[9px] font-bold text-slate-400">{theme.description}</span>
+                                            )}
                                         </div>
                                         {booster.selectedThemeId === theme.id && (
                                             <motion.div
@@ -194,13 +242,14 @@ export default function BoosterPage() {
                                 <div className="relative z-10 flex flex-col items-center gap-8 md:gap-12 max-w-2xl w-full">
                                     <BoosterSachet
                                         selectedTheme={booster.selectedTheme}
-                                        onClick={booster.openBooster}
+                                        onClick={handleOpenBooster}
+                                        isOpening={isTearing}
                                     />
 
                                     <div className="flex flex-col items-center gap-4 w-full">
                                         <OpenButton
-                                            onClick={booster.openBooster}
-                                            loading={booster.loading}
+                                            onClick={handleOpenBooster}
+                                            loading={booster.loading || isTearing}
                                             coins={booster.coins}
                                             cost={booster.cost}
                                             selectedTheme={booster.selectedTheme}

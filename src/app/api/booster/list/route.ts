@@ -27,7 +27,9 @@ export async function GET() {
                         // Generate dark/light from color if not present or just placeholders
                         dark: config.color, // Ideally would compute this
                         light: config.color,
-                        category: 'ephemeral'
+                        category: 'ephemeral',
+                        icon: config.icon,
+                        description: config.description
                     });
                 } catch (e) {
                     console.error(`Error reading booster config for ${folder}:`, e);

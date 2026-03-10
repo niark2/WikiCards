@@ -29,7 +29,7 @@ export function CardCarousel({
 }: CardCarouselProps) {
     return (
         <div className="w-full h-full flex flex-col items-center justify-center relative">
-            <div className={`relative w-full max-w-4xl h-[380px] md:h-[500px] flex items-center justify-center transition-all duration-700 ease-in-out ${revealed.length === cards.length ? '-translate-y-16 md:-translate-y-32 scale-[0.85] md:scale-90' : ''}`}>
+            <div className={`relative w-full max-w-4xl h-[380px] md:h-[500px] flex items-center justify-center transition-all duration-700 ease-in-out ${revealed.length === cards.length ? '-translate-y-16 md:-translate-y-20 scale-[0.90] md:scale-95' : ''}`}>
                 <AnimatePresence>
                     {cards.map((card, idx) => {
                         const isCardRevealed = revealed.includes(idx);
@@ -37,8 +37,8 @@ export function CardCarousel({
                         const isActive = offset === 0;
 
                         const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-                        const xOffset = offset * (isMobile ? 50 : 80);
-                        const scale = 1 - Math.abs(offset) * 0.08;
+                        const xOffset = offset * (isMobile ? 55 : 90);
+                        const scale = isActive ? 1.05 : 1 - Math.abs(offset) * 0.1;
                         const zIndex = 10 - Math.abs(offset);
                         const rotateY = offset * -5;
 
@@ -47,9 +47,9 @@ export function CardCarousel({
                                 key={card.id + idx}
                                 initial={{ opacity: 0, scale: 0.8, y: 30 }}
                                 animate={{
-                                    opacity: Math.abs(offset) > 2 ? 0 : isActive ? 1 : 0.6,
+                                    opacity: Math.abs(offset) > 2 ? 0 : isActive ? 1 : 0.7,
                                     scale: scale,
-                                    y: isActive ? -20 : 0,
+                                    y: isActive ? -10 : 0,
                                     x: xOffset,
                                     rotateY: rotateY,
                                     zIndex: zIndex

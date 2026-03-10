@@ -135,20 +135,20 @@ export function Navbar() {
                                 animate={{ x: 0 }}
                                 exit={{ x: "100%" }}
                                 transition={{ duration: 0.25, ease: "easeOut" }}
-                                style={{ position: 'fixed', top: 64, right: 0, bottom: 0, width: 280, zIndex: 201, overflowY: 'auto' }}
+                                style={{ position: 'fixed', top: 64, right: 0, bottom: 0, width: 300, zIndex: 201, overflowY: 'auto' }}
                                 className="bg-slate-950 border-l border-white/5"
                             >
                                 <div className="flex flex-col p-4 gap-1">
                                     <p className="text-[9px] font-black tracking-[0.4em] text-indigo-500 uppercase px-4 py-2 mb-1">Navigation</p>
-                                    <MobileNavLink href="/" icon={<Home className="w-5 h-5" />} label="Home" onClick={() => setIsMobileMenuOpen(false)} />
-                                    <MobileNavLink href="/booster" icon={<GalleryVertical className="w-5 h-5" />} label="Boosters" onClick={() => setIsMobileMenuOpen(false)} />
-                                    <MobileNavLink href="/collection" icon={<BookOpen className="w-5 h-5" />} label="Collection" onClick={() => setIsMobileMenuOpen(false)} />
+                                    <MobileNavLink href="/" icon={<Home className="w-5.5 h-5.5" />} label="Home" onClick={() => setIsMobileMenuOpen(false)} />
+                                    <MobileNavLink href="/booster" icon={<GalleryVertical className="w-5.5 h-5.5" />} label="Boosters" onClick={() => setIsMobileMenuOpen(false)} />
+                                    <MobileNavLink href="/collection" icon={<BookOpen className="w-5.5 h-5.5" />} label="Collection" onClick={() => setIsMobileMenuOpen(false)} />
 
                                     <div className="h-px bg-white/5 my-3" />
                                     <p className="text-[9px] font-black tracking-[0.4em] text-slate-500 uppercase px-4 py-2 mb-1">Activities</p>
-                                    <MobileNavLink href="/market" icon={<ShoppingBag className="w-5 h-5" />} label="Market" onClick={() => setIsMobileMenuOpen(false)} />
-                                    <MobileNavLink href="/craft" icon={<Hammer className="w-5 h-5" />} label="Forge" onClick={() => setIsMobileMenuOpen(false)} />
-                                    <MobileNavLink href="/gambling" icon={<Dices className="w-5 h-5" />} label="Wheel" onClick={() => setIsMobileMenuOpen(false)} />
+                                    <MobileNavLink href="/market" icon={<ShoppingBag className="w-5.5 h-5.5" />} label="Market" onClick={() => setIsMobileMenuOpen(false)} />
+                                    <MobileNavLink href="/craft" icon={<Hammer className="w-5.5 h-5.5" />} label="Forge" onClick={() => setIsMobileMenuOpen(false)} />
+                                    <MobileNavLink href="/gambling" icon={<Dices className="w-5.5 h-5.5" />} label="Wheel" onClick={() => setIsMobileMenuOpen(false)} />
                                 </div>
                             </motion.div>
                         </>
@@ -165,7 +165,7 @@ function MobileNavLink({ href, icon, label, onClick }: { href: string; icon: Rea
         <Link
             href={href}
             onClick={onClick}
-            className="flex items-center gap-4 px-4 py-3.5 text-slate-300 hover:text-white hover:bg-white/5 rounded-xl transition-all text-sm font-bold"
+            className="flex items-center gap-4.5 px-5 py-4 text-slate-300 hover:text-white hover:bg-white/5 rounded-xl transition-all text-[15px] font-bold"
         >
             <span className="text-slate-500">{icon}</span>
             {label}

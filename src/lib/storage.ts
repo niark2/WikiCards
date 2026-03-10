@@ -48,7 +48,28 @@ export const incrementDailyBooster = (): void => {
     safeSetJSON(DAILY_BOOSTER_KEY, newInfo);
 };
 
+const WIKICARD_DEFAULT: WikiCard = {
+    id: 'wikicard-starter',
+    wikiId: 'wikicard',
+    title: 'WikiCard',
+    extract: 'Ceci est la carte collector officielle de WikiCards ! Elle n\'a aucune valeur financière mais témoigne de votre début dans l\'aventure.',
+    imageUrl: '/wikicard.png',
+    views: 0,
+    rarity: 'Common',
+    url: 'https://github.com/thomas-guillouet/wikicards',
+    addedAt: Date.now()
+};
+
 export const getCollection = (): WikiCard[] => {
+    if (!isClientSide()) return [];
+
+    // Check if collection is completely uninitialized (new visitor)
+    if (localStorage.getItem(COLLECTION_KEY) === null) {
+        const initial = [WIKICARD_DEFAULT];
+        safeSetJSON(COLLECTION_KEY, initial);
+        return initial;
+    }
+
     return safeGetJSON<WikiCard[]>(COLLECTION_KEY, []);
 };
 

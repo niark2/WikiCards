@@ -76,7 +76,14 @@ export const Card = memo(function Card({ card, isRevealed = true, count = 1 }: C
 
             {/* Content */}
             <div className="p-4 flex-1 flex flex-col z-10 bg-slate-900">
-                <h3 className="font-serif font-bold text-xl leading-tight mb-2 line-clamp-2" title={card.title}>
+                <h3
+                    className={`font-serif font-bold leading-tight mb-2 line-clamp-2 ${card.title.length > 50 ? 'text-sm' :
+                            card.title.length > 35 ? 'text-base' :
+                                card.title.length > 20 ? 'text-lg' :
+                                    'text-xl'
+                        }`}
+                    title={card.title}
+                >
                     {card.title}
                 </h3>
 

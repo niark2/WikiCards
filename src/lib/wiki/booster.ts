@@ -195,14 +195,10 @@ export const generateBoosterPack = async (
         candidates = [...slot1, ...slotsRest];
 
     } else if (theme === "iron") {
-        // Blueprint: 20% chance for an Epic slot, else pure random
-        if (Math.random() < 0.2) {
-            const slot1 = await fetchSlotArticles(theme, 1, "High");
-            const slotsRest = await fetchSlotArticles(theme, 4, "Random");
-            candidates = [...slot1, ...slotsRest];
-        } else {
-            candidates = await fetchSlotArticles(theme, 5, "Random");
-        }
+        // Blueprint: 1 guaranteed Mid slot (Thematic/Popular enough), 4 Random
+        const slot1 = await fetchSlotArticles(theme, 1, "Mid");
+        const slotsRest = await fetchSlotArticles(theme, 4, "Random");
+        candidates = [...slot1, ...slotsRest];
     } else {
         // standard & everything else
         candidates = await fetchSlotArticles(theme, 5, "Random");
@@ -211,18 +207,23 @@ export const generateBoosterPack = async (
     // Convert everything to authentic cards
     const finalCards: WikiCard[] = [];
 
-    for (const candidate of candidates) {
-        let card = await convertToCard(candidate);
+    for (let i = 0; i < candidates.length; i++) {
+        let card = await convertToCard(candidates[i]);
 
-        // If Uranium accidentally drew a Common card, we throw it away and naturally draw a new one
-        // until we get a valid rarity, doing ZERO modifications to the card itself.
+        // --- Natural Selection (Retrying instead of modifying statistics) ---
+
+        // Uranium: Maximize quality by strictly filtering out Commons
         while (theme === "uranium" && card.rarity === "Common") {
             const replacement = await fetchSlotArticles(theme, 1, "Mid");
-            if (replacement.length > 0) {
-                card = await convertToCard(replacement[0]);
-            } else {
-                break; // safety break if API fails
-            }
+            if (replacement.length > 0) card = await convertToCard(replacement[0]);
+            else break;
+        }
+
+        // Iron: Guarantee at least 1 Rare+ card as per FAQ (on the first slot)
+        while (theme === "iron" && i === 0 && (card.rarity === "Common" || card.rarity === "Uncommon")) {
+            const replacement = await fetchSlotArticles(theme, 1, "Mid");
+            if (replacement.length > 0) card = await convertToCard(replacement[0]);
+            else break;
         }
 
         finalCards.push(card);

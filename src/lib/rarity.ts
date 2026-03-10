@@ -82,7 +82,7 @@ export const getCardGrade = (views: number): CardGrade => {
  * Range: 5 to 5000 WikiCoins.
  * Factors: Rarity, Views (Grade), Image, and Content.
  */
-export const calculateCardValue = (card: { rarity: Rarity, views: number, imageUrl?: string | null, extract?: string }): number => {
+export const calculateCardValue = (card: { rarity: Rarity, views: number, imageUrl?: string | null, extract?: string, title?: string, wikiId?: string }): number => {
     // Base prices by rarity
     const basePrices: Record<Rarity, number> = {
         Common: 5,
@@ -91,6 +91,9 @@ export const calculateCardValue = (card: { rarity: Rarity, views: number, imageU
         Epic: 400,
         Legendary: 1500,
     };
+
+    // Special case for the official WikiCard card (collector item, non-sellable value)
+    if (card.wikiId === "wikicard" || card.title === "WikiCard") return 0;
 
     const gradeMultipliers: Record<CardGrade, number> = {
         S: 2.5,
