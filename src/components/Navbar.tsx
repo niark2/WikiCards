@@ -6,9 +6,12 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Layers, Coins, Home, GalleryVertical, Hammer, BookOpen, ShoppingBag, Dices, ChevronDown, Compass, Menu, X } from "lucide-react";
 import { useCoins } from "@/hooks/useCoins";
+import { useSound } from "@/hooks/useSound";
+import { Volume2, VolumeX } from "lucide-react";
 
 export function Navbar() {
     const { coins } = useCoins();
+    const { isMuted, toggleMute } = useSound();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [mounted, setMounted] = useState(false);
@@ -89,6 +92,13 @@ export function Navbar() {
                         </div>
 
                         <div className="flex items-center gap-4 ml-2">
+                            <button
+                                onClick={toggleMute}
+                                className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors text-slate-400 hover:text-white"
+                                title={isMuted ? "Unmute" : "Mute"}
+                            >
+                                {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+                            </button>
                             <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-500 font-black shadow-[inset_0_0_10px_rgba(245,158,11,0.05)]">
                                 <Coins className="w-4 h-4" />
                                 {coins}
@@ -98,6 +108,12 @@ export function Navbar() {
 
                     {/* Mobile: Coins + Hamburger */}
                     <div className="flex md:hidden items-center gap-3">
+                        <button
+                            onClick={toggleMute}
+                            className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors text-slate-400 hover:text-white"
+                        >
+                            {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+                        </button>
                         <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-500 font-black text-xs">
                             <Coins className="w-3.5 h-3.5" />
                             {coins}

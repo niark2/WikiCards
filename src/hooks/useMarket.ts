@@ -10,6 +10,7 @@ import {
     MarketInfo
 } from "@/lib/storage";
 import { useCoins } from "@/hooks/useCoins";
+import { useToast } from "@/hooks/useToast";
 import { RARITY_MARKET_PRICES } from "@/lib/rarity";
 
 export function useMarket() {
@@ -17,6 +18,7 @@ export function useMarket() {
     const [marketData, setMarketData] = useState<MarketInfo | null>(null);
     const [timeLeft, setTimeLeft] = useState("");
     const { coins, deductCoins } = useCoins();
+    const { showToast } = useToast();
 
     const fetchMarket = useCallback(async () => {
         setLoading(true);
@@ -88,11 +90,12 @@ export function useMarket() {
             };
             saveMarketInfo(updatedInfo);
             setMarketData(updatedInfo);
-            saveCollection([card]);
+            saveCollection([{ ...card, obtainedFrom: "Marché Quotidien" }]);
             logActivity('card_bought', `Bought ${card.title} from the market`, price);
+            showToast(`✅ ${card.title} acquis avec succès !`, "success");
             return true;
         } else {
-            alert("Not enough WikiCoins!");
+            showToast("❌ Pas assez de WikiCoins !", "error");
             return false;
         }
     };

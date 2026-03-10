@@ -7,6 +7,7 @@ import {
     WikiSearchItem,
     WikiPageDetails,
     WikiPageViewsItem,
+    WikiImagePage,
     WIKI_API_URL,
     USER_AGENT,
 } from "./types";
@@ -74,11 +75,66 @@ export const fetchPageViews = async (title: string): Promise<number> => {
     }
 };
 
+// --- Fallback Image Fetcher ---
+
+export const fetchFallbackImage = async (imageTitles: string[]): Promise<string | null> => {
+    if (!imageTitles || imageTitles.length === 0) return null;
+
+    const excludedKeywords = [
+        "red pog", "blue pog", "green pog", "yellow pog", "white pog", "black pog",
+        "commons-logo", "question book", "ambox", "edit-clear", "magnifying glass",
+        "wikisource-logo", "wikibooks-logo", "wikiquote-logo", "wiktionary-logo",
+        "wikimedia-logo", "folder hexagonal", "symbol", "stub", "icon", "arrow",
+        "increase", "decrease", "portal-puzzle", "star", "padlock", "discourse",
+        "wikimedia", "magnifying", "search", "increase", "decrease", "padlock"
+    ];
+
+    const filtered = imageTitles.filter(title => {
+        const lower = title.toLowerCase();
+        return !excludedKeywords.some(keyword => lower.includes(keyword));
+    });
+
+    if (filtered.length === 0) return null;
+
+    // Sort to prefer "map", "location", "photo", "flag"
+    const sorted = [...filtered].sort((a, b) => {
+        const keywords = ["map", "location", "photo", "flag", "landscape", "portrait"];
+        const aScore = keywords.findIndex(k => a.toLowerCase().includes(k));
+        const bScore = keywords.findIndex(k => b.toLowerCase().includes(k));
+
+        if (aScore !== -1 && bScore !== -1) return aScore - bScore;
+        if (aScore !== -1) return -1;
+        if (bScore !== -1) return 1;
+        return 0;
+    });
+
+    const candidates = sorted.slice(0, 3);
+    const titlesParam = candidates.map(t => encodeURIComponent(t)).join('|');
+    const url = `${WIKI_API_URL}?action=query&titles=${titlesParam}&prop=imageinfo&iiprop=url&iiurlwidth=1000&format=json&origin=*`;
+
+    try {
+        const res = await fetch(url, { headers: { "User-Agent": USER_AGENT } });
+        const data = await res.json();
+        const pages = data.query?.pages || {};
+
+        // Important: preserve sort order from our sorting logic
+        const results = Object.values(pages) as WikiImagePage[];
+        for (const title of candidates) {
+            const page = results.find(p => p.title === title);
+            if (page?.imageinfo?.[0]?.thumburl) return page.imageinfo[0].thumburl;
+            if (page?.imageinfo?.[0]?.url && !page.imageinfo[0].url.endsWith(".svg")) return page.imageinfo[0].url;
+        }
+    } catch (e) {
+        console.error("Error fetching fallback image info:", e);
+    }
+    return null;
+};
+
 // --- Article details ---
 
 export const fetchArticleDetails = async (pageids: string[]): Promise<Record<string, WikiPageDetails>> => {
     const ids = pageids.join("|");
-    const url = `${WIKI_API_URL}?action=query&prop=extracts%7Cpageimages%7Cinfo&exintro=1&explaintext=1&piprop=original%7Cthumbnail&pithumbsize=800&pilicense=any&inprop=url&pageids=${ids}&format=json&origin=*`;
+    const url = `${WIKI_API_URL}?action=query&prop=extracts%7Cpageimages%7Cinfo%7Cimages&exintro=1&explaintext=1&piprop=original%7Cthumbnail&pithumbsize=800&pilicense=any&imlimit=20&inprop=url&pageids=${ids}&format=json&origin=*`;
     const res = await fetch(url, { headers: { "User-Agent": USER_AGENT } });
     const data = await res.json();
     return data.query.pages as Record<string, WikiPageDetails>;
@@ -86,11 +142,13 @@ export const fetchArticleDetails = async (pageids: string[]): Promise<Record<str
 
 // --- Single article fetch ---
 
-export const fetchWikiArticle = async (pageIdentifier: string): Promise<WikiCard | null> => {
+export const fetchWikiArticle = async (pageIdentifier: string, full: boolean = false): Promise<WikiCard | null> => {
     const isId = /^\d+$/.test(pageIdentifier);
     const param = isId ? `pageids=${pageIdentifier}` : `titles=${encodeURIComponent(pageIdentifier)}`;
 
-    const url = `${WIKI_API_URL}?action=query&prop=extracts%7Cpageimages%7Cinfo&exintro=1&explaintext=1&piprop=original%7Cthumbnail&pithumbsize=1000&pilicense=any&inprop=url&${param}&redirects=1&format=json&origin=*`;
+    // If full is true, we don't use exintro so we get more than just the first paragraph
+    const introParam = full ? "" : "&exintro=1";
+    const url = `${WIKI_API_URL}?action=query&prop=extracts%7Cpageimages%7Cinfo%7Cimages&explaintext=1${introParam}&piprop=original%7Cthumbnail&pithumbsize=1000&pilicense=any&imlimit=20&inprop=url&${param}&redirects=1&format=json&origin=*`;
 
     try {
         const res = await fetch(url, { headers: { "User-Agent": USER_AGENT } });
@@ -109,12 +167,17 @@ export const fetchWikiArticle = async (pageIdentifier: string): Promise<WikiCard
         const views = await fetchPageViews(details.title);
         const rarity = calculateRarity(views, false);
 
+        let imageUrl = details.original?.source || details.thumbnail?.source || null;
+        if (!imageUrl && details.images && details.images.length > 0) {
+            imageUrl = await fetchFallbackImage(details.images.map(img => img.title));
+        }
+
         return {
             id: pageId,
             wikiId: pageId,
             title: details.title,
-            extract: truncateExtract(details.extract || ""),
-            imageUrl: details.original?.source || details.thumbnail?.source || null,
+            extract: full ? (details.extract || "") : truncateExtract(details.extract || ""),
+            imageUrl,
             views,
             rarity,
             url: details.fullurl || `https://en.wikipedia.org/?curid=${pageId}`,

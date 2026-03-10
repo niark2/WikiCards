@@ -2,13 +2,15 @@
 
 import { useState, useRef } from "react";
 import { motion, AnimatePresence, useAnimation } from "framer-motion";
-import { Coins, Trophy, AlertCircle, RefreshCw, Star, Dices, CircleOff } from "lucide-react";
+import { Coins, Trophy, RefreshCw, Star, Dices, CircleOff } from "lucide-react";
 import { useCoins } from "@/hooks/useCoins";
+import { useSound } from "@/hooks/useSound";
+import { useToast } from "@/hooks/useToast";
 import { saveCollection, logActivity } from "@/lib/storage";
 import { Card } from "@/components/Card";
 import { WikiCard } from "@/types";
 
-const SPIN_COST = 50;
+const SPIN_COST = 80;
 
 interface Reward {
     id: number;
@@ -20,19 +22,20 @@ interface Reward {
 }
 
 const REWARDS: Reward[] = [
-    { id: 0, type: 'coins', label: "PERDU", value: 0, chance: 0.40, color: "#1e293b" },
+    { id: 0, type: 'coins', label: "PERDU", value: 0, chance: 0.45, color: "#1e293b" },
     { id: 1, type: 'coins', label: "GAIN PIÈCES", value: 250, chance: 0.30, color: "#6366f1" },
     { id: 2, type: 'card', label: "CARTE RARE", value: "Epic", chance: 0.20, color: "#ec4899" },
-    { id: 3, type: 'coins', label: "JACKPOT", value: 1000, chance: 0.10, color: "#f59e0b" },
+    { id: 3, type: 'coins', label: "JACKPOT", value: 1000, chance: 0.05, color: "#f59e0b" },
 ];
 
 export default function GamblingPage() {
     const { addCoins, deductCoins } = useCoins();
+    const { playCoinSound, playRevealSound, playDrawSound } = useSound();
     const [isSpinning, setIsSpinning] = useState(false);
     const [rotation, setRotation] = useState(0);
     const [result, setResult] = useState<Reward | null>(null);
     const [wonCard, setWonCard] = useState<WikiCard | null>(null);
-    const [error, setError] = useState<string | null>(null);
+    const { showToast } = useToast();
     const controls = useAnimation();
     const wheelRef = useRef<HTMLDivElement>(null);
 
@@ -41,7 +44,6 @@ export default function GamblingPage() {
 
         if (deductCoins(SPIN_COST)) {
             setIsSpinning(true);
-            setError(null);
             setResult(null);
             setWonCard(null);
             logActivity('coins_added', `Bet ${SPIN_COST} on the WikiWheel`, -SPIN_COST);
@@ -67,15 +69,21 @@ export default function GamblingPage() {
             const newRotation = (currentFullSpins + extraSpins + 2) * 360 + (targetSegment * segmentAngle);
             setRotation(newRotation);
 
+            const interval = setInterval(() => {
+                playDrawSound();
+            }, 300);
+
             await controls.start({
                 rotate: -newRotation,
                 transition: { duration: 4, ease: [0.15, 0, 0.15, 1] }
             });
 
+            clearInterval(interval);
+
             handleWin(winningReward);
             setIsSpinning(false);
         } else {
-            setError("Pas assez de WikiCoins !");
+            showToast("❌ Pas assez de WikiCoins !", "error");
         }
     };
 
@@ -90,12 +98,16 @@ export default function GamblingPage() {
             // 60% chance for 50
 
             addCoins(amount);
+            playCoinSound();
             setResult({ ...reward, value: amount, label: `${amount} PIÈCES` });
             logActivity('coins_added', `Won ${amount} WikiCoins from WikiWheel`, amount);
+            showToast(`💰 Vous avez gagné ${amount} WikiCoins !`, "success");
 
         } else if (reward.id === 3) { // JACKPOT Quadrant
             addCoins(1000);
+            playCoinSound();
             logActivity('coins_added', `Won JACKPOT (1000) from WikiWheel`, 1000);
+            showToast("🎉 JACKPOT ! 1000 WikiCoins !", "success");
 
         } else if (reward.type === 'card') {
             const roll = Math.random();
@@ -107,9 +119,13 @@ export default function GamblingPage() {
             if (card) {
                 saveCollection([card]);
                 setWonCard(card);
+                playRevealSound(card.rarity);
                 setResult({ ...reward, value: card.rarity, label: `CARTE ${card.rarity === 'Epic' ? 'ÉPIQUE' : 'LÉGENDE'}` });
                 logActivity('card_bought', `Won ${card.rarity} card: ${card.title} from WikiWheel`, 0);
+                showToast(`✨ Vous avez gagné une carte ${card.rarity} !`, "success");
             }
+        } else if (reward.id === 0) {
+            showToast("😔 Perdu... Réessayez !", "info");
         }
     };
 
@@ -199,7 +215,7 @@ export default function GamblingPage() {
                             {isSpinning ? (
                                 <RefreshCw className="w-6 h-6 animate-spin" />
                             ) : (
-                                "JOUER (50 🪙)"
+                                `JOUER (${SPIN_COST} 🪙)`
                             )}
                         </button>
                     </div>
@@ -244,7 +260,7 @@ export default function GamblingPage() {
                             <CircleOff className="w-5 h-5" />
                         </div>
                         <div className="overflow-hidden">
-                            <div className="font-black text-[10px] uppercase truncate">PERDU (40%)</div>
+                            <div className="font-black text-[10px] uppercase truncate">PERDU (45%)</div>
                         </div>
                     </div>
                     <div className="p-4 bg-slate-900/40 rounded-2xl border border-white/5 flex items-center gap-3">
@@ -270,7 +286,7 @@ export default function GamblingPage() {
                             <Trophy className="w-5 h-5" />
                         </div>
                         <div className="overflow-hidden">
-                            <div className="font-black text-[10px] uppercase truncate">JACKPOT (10%)</div>
+                            <div className="font-black text-[10px] uppercase truncate">JACKPOT (5%)</div>
                             <div className="text-[8px] text-slate-500 font-bold uppercase">1000 PIÈCES FIXE</div>
                         </div>
                     </div>

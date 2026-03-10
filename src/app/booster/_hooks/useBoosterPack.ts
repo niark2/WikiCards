@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback } from "react";
 import { WikiCard } from "@/types";
 import { saveCollection, logActivity, getDailyBoosterInfo, incrementDailyBooster } from "@/lib/storage";
 import { useCoins } from "@/hooks/useCoins";
+import { useSound } from "@/hooks/useSound";
+import { useToast } from "@/hooks/useToast";
 
 export interface BoosterTheme {
     id: string;
@@ -37,6 +39,8 @@ export function useBoosterPack() {
     const [selectedThemeId, setSelectedThemeId] = useState("");
     const [dailyInfo, setDailyInfo] = useState({ count: 0, lastReset: "" });
     const { coins, deductCoins, addCoins } = useCoins();
+    const { playRevealSound } = useSound();
+    const { showToast } = useToast();
     const [availableThemes, setAvailableThemes] = useState<BoosterTheme[]>(THEMES);
 
     useEffect(() => {
@@ -67,17 +71,18 @@ export function useBoosterPack() {
     const freeRemaining = FREE_LIMIT - dailyInfo.count;
 
     const revealCardsSequentially = useCallback((newCards: WikiCard[]) => {
-        newCards.forEach((_, index) => {
+        newCards.forEach((card, index) => {
             setTimeout(() => {
                 setRevealed(prev => [...prev, index]);
+                playRevealSound(card.rarity);
             }, 500 + index * 600);
         });
-    }, []);
+    }, [playRevealSound]);
 
     const openBooster = useCallback(async () => {
         // Pre-check balance without deducting yet
         if (cost > 0 && coins < cost) {
-            alert("Not enough WikiCoins! Discard cards in your collection to get more.");
+            showToast("❌ Pas assez de WikiCoins !", "error");
             return;
         }
 
@@ -100,7 +105,7 @@ export function useBoosterPack() {
                 if (cost > 0) {
                     const success = deductCoins(cost);
                     if (!success) {
-                        alert("Not enough WikiCoins! (Your balance might have changed)");
+                        showToast("❌ Pas assez de WikiCoins !", "error");
                         setLoading(false);
                         return;
                     }
@@ -108,7 +113,10 @@ export function useBoosterPack() {
 
                 setCards(data.cards);
 
-                const articles = (data.cards as WikiCard[]).filter(c => !c.isCoinValue);
+                const articles = (data.cards as WikiCard[]).map(c => ({
+                    ...c,
+                    obtainedFrom: `Booster ${selectedTheme.label}`
+                })).filter(c => !c.isCoinValue);
                 saveCollection(articles);
 
                 if (selectedThemeId === "") {
@@ -122,6 +130,7 @@ export function useBoosterPack() {
                     if (c.isCoinValue) {
                         addCoins(c.isCoinValue);
                         logActivity('coins_added', `Found ${c.isCoinValue} WikiCoins in a booster`, c.isCoinValue);
+                        showToast(`💰 Vous avez trouvé ${c.isCoinValue} WikiCoins !`, "success");
                     }
                 });
 
@@ -131,11 +140,11 @@ export function useBoosterPack() {
             }
         } catch (e) {
             console.error(e);
-            alert(e instanceof Error ? e.message : "Failed to fetch booster pack.");
+            showToast("❌ Erreur lors de l'ouverture du booster", "error");
         } finally {
             setLoading(false);
         }
-    }, [cost, coins, deductCoins, selectedThemeId, selectedTheme.label, addCoins, revealCardsSequentially]);
+    }, [cost, coins, deductCoins, selectedThemeId, selectedTheme.label, addCoins, revealCardsSequentially, showToast]);
 
     const resetPack = useCallback(() => {
         setCards(null);

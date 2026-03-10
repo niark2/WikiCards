@@ -5,6 +5,8 @@ import { WikiCard } from "@/types";
 import { Card } from "@/components/Card";
 import { Hammer, Search, Coins, AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
 import { useCoins } from "@/hooks/useCoins";
+import { useSound } from "@/hooks/useSound";
+import { useToast } from "@/hooks/useToast";
 import { saveCollection, logActivity } from "@/lib/storage";
 import { fetchWikiArticle, parseWikipediaIdentifier } from "@/lib/wiki";
 import { RARITY_CRAFT_COSTS } from "@/lib/rarity";
@@ -17,6 +19,8 @@ export default function CraftPage() {
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
     const { deductCoins } = useCoins();
+    const { playForgeSound } = useSound();
+    const { showToast } = useToast();
 
     const handlePreview = async () => {
         if (!url) return;
@@ -36,6 +40,7 @@ export default function CraftPage() {
             }
         } catch {
             setError("An error occurred while fetching the article.");
+            showToast("❌ Impossible de trouver l'article", "error");
         } finally {
             setLoading(false);
         }
@@ -47,14 +52,21 @@ export default function CraftPage() {
 
         if (deductCoins(price)) {
             // Generate a unique instance ID while keeping the same card data
-            const craftedCard = { ...card, id: `${card.id}-${Date.now()}` };
+            const craftedCard: WikiCard = {
+                ...card,
+                id: `${card.id}-${Date.now()}`,
+                obtainedFrom: "Forgé dans la Forge"
+            };
             saveCollection([craftedCard]);
             logActivity('card_crafted', `Crafted card: ${card.title}`, -price);
+            playForgeSound();
             setSuccess(true);
+            showToast(`✅ ${card.title} forgée avec succès !`, "success");
             setCard(null);
             setUrl("");
         } else {
             setError("Not enough WikiCoins to craft this card.");
+            showToast("❌ Pas assez de WikiCoins", "error");
         }
     };
 

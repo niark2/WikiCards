@@ -4,6 +4,8 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { getCollection, getPlaylists, savePlaylists, removeCard, logActivity } from "@/lib/storage";
 import { WikiCard, Rarity, Playlist } from "@/types";
 import { useCoins } from "@/hooks/useCoins";
+import { useSound } from "@/hooks/useSound";
+import { useToast } from "@/hooks/useToast";
 import { safeSetItem } from "@/lib/safe-storage";
 import { calculateCardValue, RARITY_SORT_ORDER } from "@/lib/rarity";
 
@@ -29,6 +31,8 @@ export function useCollectionState() {
     const [isImporting, setIsImporting] = useState(false);
 
     const { addCoins, coins } = useCoins();
+    const { playCoinSound } = useSound();
+    const { showToast } = useToast();
 
     const refreshData = useCallback(() => {
         setCards(getCollection());
@@ -103,10 +107,12 @@ export function useCollectionState() {
         if (confirm(`Discard ${card.title} for ${sellValue} WikiCoins?`)) {
             removeCard(card.id);
             addCoins(sellValue);
+            playCoinSound();
             logActivity('card_sold', `Sold unique card: ${card.title}`, sellValue);
+            showToast(`✅ ${card.title} sold for ${sellValue} WikiCoins`, 'success');
             refreshData();
         }
-    }, [addCoins, refreshData]);
+    }, [addCoins, refreshData, playCoinSound, showToast]);
 
     const handleBatchDiscard = useCallback(() => {
         const selectedCards = cards.filter(c => selectedCardIds.includes(c.id));
@@ -115,12 +121,14 @@ export function useCollectionState() {
         if (confirm(`Discard ${selectedCardIds.length} selected cards for ${totalCoins} WikiCoins?`)) {
             selectedCardIds.forEach(id => removeCard(id));
             addCoins(totalCoins);
+            playCoinSound();
             logActivity('card_sold', `Batch sold ${selectedCardIds.length} cards`, totalCoins);
+            showToast(`✅ ${selectedCardIds.length} cards sold for ${totalCoins} WikiCoins`, 'success');
             setSelectedCardIds([]);
             setCardSelectionMode(false);
             refreshData();
         }
-    }, [cards, selectedCardIds, addCoins, refreshData]);
+    }, [cards, selectedCardIds, addCoins, refreshData, playCoinSound, showToast]);
 
     const handleBatchAddToPlaylist = useCallback((playlistId: string) => {
         const newPlaylists = playlists.map(p => {
@@ -208,13 +216,14 @@ export function useCollectionState() {
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
             logActivity('collection_exported', 'Exported collection to JSON');
+            showToast("📁 Collection backup exported successfully", "success");
         } catch (error) {
             console.error("Export failed:", error);
-            alert("Failed to export collection.");
+            showToast("❌ Failed to export collection", "error");
         } finally {
             setIsExporting(false);
         }
-    }, [cards, playlists, coins]);
+    }, [cards, playlists, coins, showToast]);
 
     const handleImport = useCallback(() => {
         const input = document.createElement("input");
@@ -254,7 +263,7 @@ export function useCollectionState() {
                         safeSetItem("wikicards_coins", (coins + data.coins).toString());
                         window.dispatchEvent(new Event("coins-updated"));
                     }
-                    alert(`Imported ${newCards.length} new cards.`);
+                    showToast(`✅ Imported ${newCards.length} new cards`, "success");
                     logActivity('collection_imported', `Merged ${newCards.length} cards from import`);
                 } else {
                     // Replace
@@ -265,20 +274,20 @@ export function useCollectionState() {
                             safeSetItem("wikicards_coins", data.coins.toString());
                             window.dispatchEvent(new Event("coins-updated"));
                         }
-                        alert("Collection replaced successfully.");
+                        showToast("✅ Collection replaced successfully", "success");
                         logActivity('collection_imported', 'Replaced entire collection from import');
                     }
                 }
                 refreshData();
             } catch (error) {
                 console.error("Import failed:", error);
-                alert("Failed to import collection. Is it a valid WikiCards JSON backup?");
+                showToast("❌ Invalid backup file", "error");
             } finally {
                 setIsImporting(false);
             }
         };
         input.click();
-    }, [cards, playlists, coins, refreshData]);
+    }, [cards, playlists, coins, refreshData, showToast]);
 
     return {
         // Data

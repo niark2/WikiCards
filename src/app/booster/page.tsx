@@ -3,12 +3,13 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useBoosterPack, BoosterTheme } from "./_hooks/useBoosterPack";
+import { useSound } from "@/hooks/useSound";
 import { BoosterSachet, LoadingSpinner } from "./_components/BoosterSachet";
 import { ThemeSelector, OpenButton } from "./_components/BoosterControls";
 import { CardCarousel } from "./_components/CardCarousel";
 import { Sparkles, Shield, Scroll, Atom, Palette, Trophy, Zap, Flag, Ghost } from "lucide-react";
 
-function ThemeIcon({ theme, className = "", style = {} }: { theme: BoosterTheme, className?: string, style?: any }) {
+function ThemeIcon({ theme, className = "", style = {} }: { theme: BoosterTheme, className?: string, style?: React.CSSProperties }) {
     const iconName = theme.icon || "Sparkles";
 
     switch (iconName) {
@@ -28,6 +29,7 @@ function ThemeIcon({ theme, className = "", style = {} }: { theme: BoosterTheme,
 
 export default function BoosterPage() {
     const booster = useBoosterPack();
+    const { playBoosterOpenSound } = useSound();
     const [isTearing, setIsTearing] = useState(false);
 
     const handleOpenBooster = async () => {
@@ -38,6 +40,7 @@ export default function BoosterPage() {
 
         if (isTearing || booster.loading) return;
 
+        playBoosterOpenSound();
         setIsTearing(true);
         setTimeout(() => {
             setIsTearing(false);

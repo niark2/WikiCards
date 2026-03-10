@@ -18,7 +18,7 @@ export async function GET(request: Request) {
         }
 
         return NextResponse.json({ success: false, error: "Theme not found" }, { status: 404 });
-    } catch (error) {
+    } catch {
         return NextResponse.json({ success: false, error: "Failed to fetch config" }, { status: 500 });
     }
 }

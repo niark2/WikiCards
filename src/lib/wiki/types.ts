@@ -18,6 +18,18 @@ export interface WikiPageDetails {
     thumbnail?: { source: string };
     fullurl?: string;
     missing?: string;
+    images?: { title: string }[];
+}
+
+export interface WikiImageInfo {
+    thumburl?: string;
+    url?: string;
+}
+
+export interface WikiImagePage {
+    pageid: number;
+    title: string;
+    imageinfo?: WikiImageInfo[];
 }
 
 export interface WikiPageViewsItem {

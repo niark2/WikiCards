@@ -12,6 +12,7 @@ export interface WikiCard {
     created?: string; // We might not have this depending on API
     isCoinValue?: number; // If set, this card is actually just a coin bundle
     addedAt?: number; // Timestamp when card was added to collection
+    obtainedFrom?: string; // Where the card was acquired (e.g., booster name, forge, market)
 }
 
 export interface Playlist {

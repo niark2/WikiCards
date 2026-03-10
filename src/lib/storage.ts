@@ -87,7 +87,8 @@ export const saveCollection = (newCards: WikiCard[]): void => {
             ...card,
             id: uniqueId,
             wikiId: card.wikiId || card.id, // Ensure wikiId is preserved or set from legacy id
-            addedAt: card.addedAt || Date.now()
+            addedAt: card.addedAt || Date.now(),
+            obtainedFrom: card.obtainedFrom || 'Unknown Source'
         };
         current.push(cardToSave);
     });

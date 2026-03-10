@@ -3,15 +3,16 @@
 import { WikiCard } from "@/types";
 import { RarityBadge } from "./RarityBadge";
 import Image from "next/image";
+import Link from "next/link";
 import { Eye } from "lucide-react";
 import { memo } from "react";
 import { formatViews } from "@/lib/format";
-import { getCardGrade } from "@/lib/rarity";
 
 interface CardProps {
     card: WikiCard;
     isRevealed?: boolean;
     count?: number;
+    hideLink?: boolean;
 }
 
 const borderColors = {
@@ -30,7 +31,7 @@ const holoLayers = {
     Legendary: "holo-legendary",
 };
 
-export const Card = memo(function Card({ card, isRevealed = true, count = 1 }: CardProps) {
+export const Card = memo(function Card({ card, isRevealed = true, count = 1, hideLink = false }: CardProps) {
     if (!isRevealed) {
         return (
             <div className="w-64 h-96 rounded-2xl bg-slate-900 border-2 border-slate-800 flex items-center justify-center flex-col gap-4 shadow-xl">
@@ -78,9 +79,9 @@ export const Card = memo(function Card({ card, isRevealed = true, count = 1 }: C
             <div className="p-4 flex-1 flex flex-col z-10 bg-slate-900">
                 <h3
                     className={`font-serif font-bold leading-tight mb-2 line-clamp-2 ${card.title.length > 50 ? 'text-sm' :
-                            card.title.length > 35 ? 'text-base' :
-                                card.title.length > 20 ? 'text-lg' :
-                                    'text-xl'
+                        card.title.length > 35 ? 'text-base' :
+                            card.title.length > 20 ? 'text-lg' :
+                                'text-xl'
                         }`}
                     title={card.title}
                 >
@@ -98,9 +99,11 @@ export const Card = memo(function Card({ card, isRevealed = true, count = 1 }: C
                             <Eye className="w-3.5 h-3.5" />
                             {formatViews(card.views)}
                         </div>
-                        <a href={card.url} target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:text-indigo-300 transition-colors z-30 relative">
-                            Read Wiki
-                        </a>
+                        {!hideLink && (
+                            <Link href={`/card/${card.wikiId || card.id}`} className="text-indigo-400 hover:text-indigo-300 font-bold transition-all hover:scale-105 active:scale-95 z-30 relative">
+                                View Details
+                            </Link>
+                        )}
                     </div>
                 )}
             </div>

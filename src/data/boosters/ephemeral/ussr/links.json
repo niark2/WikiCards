@@ -1,8 +1,8 @@
 {
-    "name": "USSR Edition",
+    "name": "USSR Edition V2",
     "description": "Archives of the Soviet Union.",
     "color": "#6d071a",
-    "cost": 100,
+    "cost": 250,
     "icon": "Flag",
     "links": [
         "https://en.wikipedia.org/wiki/Soviet_Union",
@@ -52,6 +52,31 @@
         "https://en.wikipedia.org/wiki/Vostok_1",
         "https://en.wikipedia.org/wiki/City_of_science_(Soviet_Union)",
         "https://en.wikipedia.org/wiki/Science_and_technology_in_the_Soviet_Union",
-        "https://en.wikipedia.org/wiki/Dissolution_of_the_Soviet_Union"
+        "https://en.wikipedia.org/wiki/Dissolution_of_the_Soviet_Union",
+        "https://en.wikipedia.org/wiki/Lacy-Zarubin_Agreement",
+        "https://en.wikipedia.org/wiki/Lagpunkt",
+        "https://en.wikipedia.org/wiki/Sariya_Lakoba",
+        "https://en.wikipedia.org/wiki/Lankaran_Uprisings",
+        "https://en.wikipedia.org/wiki/Latvian_Soviet_Encyclopedia",
+        "https://en.wikipedia.org/wiki/Klavdiya_Latysheva",
+        "https://en.wikipedia.org/wiki/Dmitry_Lebed_(revolutionary)",
+        "https://en.wikipedia.org/wiki/Pavel_Lebedev-Polianskii",
+        "https://en.wikipedia.org/wiki/Vera_Lebedeva",
+        "https://en.wikipedia.org/wiki/Lezgistan",
+        "https://en.wikipedia.org/wiki/Evsei_Liberman",
+        "https://en.wikipedia.org/wiki/Life_has_become_better",
+        "https://en.wikipedia.org/wiki/Linguistics_in_the_Soviet_Union",
+        "https://en.wikipedia.org/wiki/Leningrad_Military_District",
+        "https://en.wikipedia.org/wiki/Leningrad_Naval_Base",
+        "https://en.wikipedia.org/wiki/Leningrad_Secondary_Art_School",
+        "https://en.wikipedia.org/wiki/Leninist_Young_Communist_League_of_Estonia",
+        "https://en.wikipedia.org/wiki/List_of_commemorative_coins_of_the_Soviet_Union",
+        "https://en.wikipedia.org/wiki/List_of_female_Heroes_of_the_Soviet_Union",
+        "https://en.wikipedia.org/wiki/List_of_foreign_Heroes_of_the_Soviet_Union",
+        "https://en.wikipedia.org/wiki/List_of_GOST_standards",
+        "https://en.wikipedia.org/wiki/List_of_nuclear_weapons_tests_of_the_Soviet_Union",
+        "https://en.wikipedia.org/wiki/List_of_Soviet_computer_systems",
+        "https://en.wikipedia.org/wiki/List_of_Soviet_poster_artists",
+        "https://en.wikipedia.org/wiki/2nd_Soviet_Antarctic_Expedition"
     ]
 }

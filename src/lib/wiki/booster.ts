@@ -15,6 +15,7 @@ import {
     fetchPopularArticles,
     fetchPageViews,
     fetchArticleDetails,
+    fetchFallbackImage,
 } from "./api";
 
 // --- Slot-based Booster Generation ---
@@ -76,12 +77,17 @@ export const convertToCard = async (
     // Rarity is now mathematically strict, based 100% on natural Wikipedia views. Zero artificial chance.
     const rarity = calculateRarity(views, false);
 
+    let imageUrl = candidate.details.original?.source || candidate.details.thumbnail?.source || null;
+    if (!imageUrl && candidate.details.images && candidate.details.images.length > 0) {
+        imageUrl = await fetchFallbackImage(candidate.details.images.map(img => img.title));
+    }
+
     return {
         id: candidate.id.toString(),
         wikiId: candidate.id.toString(),
         title: candidate.title,
         extract: truncateExtract(candidate.details.extract || ""),
-        imageUrl: candidate.details.original?.source || candidate.details.thumbnail?.source || null,
+        imageUrl,
         views,
         rarity,
         url: candidate.details.fullurl || `https://en.wikipedia.org/?curid=${candidate.id}`,
@@ -142,7 +148,7 @@ export const generateBoosterPack = async (
         // (Legacy custom titles support for redeems)
         let rawArticles: { id: number; title: string }[] = [];
         const cleaned = customTitles.map(t => parseWikipediaIdentifier(t));
-        const selected = cleaned.slice(0, size);
+        const selected = cleaned.sort(() => Math.random() - 0.5).slice(0, size);
 
         const titlesParam = selected.map(t => encodeURIComponent(t)).join('|');
         const url = `${WIKI_API_URL}?action=query&titles=${titlesParam}&format=json&origin=*`;

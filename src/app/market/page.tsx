@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { useMarket } from "@/hooks/useMarket";
 import { MarketCard } from "./_components/MarketCard";
-import { ShoppingBag, Timer, RefreshCw } from "lucide-react";
+import { Timer, RefreshCw } from "lucide-react";
 
 export default function MarketPage() {
     const market = useMarket();

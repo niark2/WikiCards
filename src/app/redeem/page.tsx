@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Ticket, Coins, AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
 import { useCoins } from "@/hooks/useCoins";
+import { useToast } from "@/hooks/useToast";
 import { logActivity, saveCollection, getRedeemedCodes, markCodeAsRedeemed } from "@/lib/storage";
 import { fetchWikiArticle, parseWikipediaIdentifier } from "@/lib/wiki";
 import { REDEEM_CODES } from "@/lib/redeem-codes";
@@ -13,6 +14,7 @@ export default function RedeemPage() {
     const [status, setStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
     const [loading, setLoading] = useState(false);
     const { addCoins } = useCoins();
+    const { showToast } = useToast();
 
     const handleRedeem = async () => {
         if (!code) return;
@@ -24,6 +26,7 @@ export default function RedeemPage() {
             const alreadyRedeemed = getRedeemedCodes();
             if (alreadyRedeemed.includes(normalizedCode)) {
                 setStatus({ type: 'error', message: "This code has already been redeemed." });
+                showToast("❌ Code déjà utilisé", "error");
                 return;
             }
 
@@ -38,6 +41,7 @@ export default function RedeemPage() {
                         type: 'success',
                         message: reward.successMessage || `SUCCESS! +${amount} WikiCoins added to your balance.`
                     });
+                    showToast(`🎉 Code valide ! +${amount} WikiCoins`, "success");
                 } else if (reward.type === 'card') {
                     const articleIdentifier = reward.value as string;
                     const title = parseWikipediaIdentifier(articleIdentifier);
@@ -51,18 +55,21 @@ export default function RedeemPage() {
                             type: 'success',
                             message: reward.successMessage || `SUCCESS! You received a special card: ${cardData.title}!`
                         });
+                        showToast(`🎉 Code valide ! Vous avez reçu ${cardData.title}`, "success");
                     } else {
                         setStatus({ type: 'error', message: "Failed to fetch reward card. Please try again later." });
                     }
                 }
                 setCode("");
-            } catch (error) {
+            } catch {
                 setStatus({ type: 'error', message: "An error occurred during redemption." });
+                showToast("❌ Erreur lors de l'activation", "error");
             } finally {
                 setLoading(false);
             }
         } else {
             setStatus({ type: 'error', message: "Invalid or expired code." });
+            showToast("❌ Code invalide ou expiré", "error");
         }
 
         setTimeout(() => {

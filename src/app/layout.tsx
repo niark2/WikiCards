@@ -19,6 +19,7 @@ export const metadata: Metadata = {
 };
 
 import { Footer } from "@/components/Footer";
+import { ToastProvider } from "@/hooks/useToast";
 
 export default function RootLayout({
   children,
@@ -30,11 +31,13 @@ export default function RootLayout({
       <body
         className={`${outfit.variable} ${cinzel.variable} antialiased font-sans bg-slate-950 text-slate-50 min-h-screen flex flex-col pt-16`}
       >
-        <Navbar />
-        <main className="flex-1 flex flex-col">
-          {children}
-        </main>
-        <Footer />
+        <ToastProvider>
+          <Navbar />
+          <main className="flex-1 flex flex-col">
+            {children}
+          </main>
+          <Footer />
+        </ToastProvider>
       </body>
     </html>
   );
