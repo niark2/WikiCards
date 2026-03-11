@@ -106,10 +106,10 @@ export default function GamblingPage() {
 
         if (reward.id === 1) { // GAIN PIÈCES Quadrant
             const roll = Math.random();
-            let amount = 50;
-            if (roll > 0.90) amount = 200;      // 10% chance
-            else if (roll > 0.60) amount = 100; // 30% chance
-            // 60% chance for 50
+            let amount = 100;
+            if (roll > 0.90) amount = 300;      // 10% chance
+            else if (roll > 0.60) amount = 200; // 30% chance
+            // 60% chance for 100
 
             addCoins(amount);
             playCoinSound();
@@ -298,7 +298,7 @@ export default function GamblingPage() {
                         </div>
                         <div className="overflow-hidden">
                             <div className="font-black text-[10px] uppercase truncate">COINS (35%)</div>
-                            <div className="text-[8px] text-slate-500 font-bold uppercase mt-0.5">50 (60%) • 100 (30%) • 200 (10%)</div>
+                            <div className="text-[8px] text-slate-500 font-bold uppercase mt-0.5">100 (60%) • 200 (30%) • 300 (10%)</div>
                         </div>
                     </div>
                     <div className="p-4 bg-slate-900/40 rounded-2xl border border-white/5 flex items-center gap-3">
