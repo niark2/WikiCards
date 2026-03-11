@@ -1,8 +1,9 @@
 "use client";
 
 import { Rarity } from "@/types";
-import { Layers, Calendar, Download, Upload, Search } from "lucide-react";
+import { Layers, Calendar, Download, Upload, Search, Rocket, Crown, Sparkles, Library, Award } from "lucide-react";
 import { SortOption } from "../_hooks/useCollectionState";
+import { BINDERS } from "@/lib/binders/config";
 
 interface CollectionHeaderProps {
     groupedCardsCount: number;
@@ -18,11 +19,23 @@ interface CollectionHeaderProps {
     toggleSelectionMode: () => void;
     handleExport: () => void;
     handleImport: () => void;
+    claimedBinderIds: string[];
     isExporting?: boolean;
     isImporting?: boolean;
 }
 
 const RARITIES: (Rarity | "All")[] = ["All", "Legendary", "Epic", "Rare", "Uncommon", "Common"];
+
+function AlbumIcon({ name, className = "" }: { name: string, className?: string }) {
+    switch (name) {
+        case 'Rocket': return <Rocket className={className} />;
+        case 'Layers': return <Layers className={className} />;
+        case 'Crown': return <Crown className={className} />;
+        case 'Sparkles': return <Sparkles className={className} />;
+        case 'Library': return <Library className={className} />;
+        default: return <Award className={className} />;
+    }
+}
 
 export function CollectionHeader({
     groupedCardsCount,
@@ -38,9 +51,11 @@ export function CollectionHeader({
     toggleSelectionMode,
     handleExport,
     handleImport,
+    claimedBinderIds,
     isExporting,
     isImporting,
 }: CollectionHeaderProps) {
+    const claimedAlbums = BINDERS.filter(b => claimedBinderIds.includes(b.id));
     return (
         <div className="mb-6 border-b border-white/5 pb-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2">
@@ -60,6 +75,28 @@ export function CollectionHeader({
                                 {totalValue.toLocaleString()} WikiCoins
                             </span>
                         </p>
+                        
+                        {/* Album Badges */}
+                        {claimedAlbums.length > 0 && (
+                            <div className="flex flex-wrap items-center gap-2 mt-2 mb-4">
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mr-1">Awards:</span>
+                                {claimedAlbums.map(album => (
+                                    <div 
+                                        key={album.id}
+                                        title={`${album.title} (Completed)`}
+                                        className="group relative w-8 h-8 rounded-lg bg-indigo-600/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 hover:bg-indigo-600 hover:text-white transition-all cursor-help"
+                                    >
+                                        <AlbumIcon name={album.icon} className="w-4 h-4" />
+                                        <div className="absolute -bottom-1 -right-1 w-2.5 h-2.5 bg-indigo-500 rounded-full border-2 border-slate-950" />
+                                        
+                                        {/* Tooltip on hover */}
+                                        <div className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-900 text-[9px] font-bold text-white rounded border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
+                                            {album.title}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </div>
 

@@ -31,9 +31,22 @@ export default function CollectionPage() {
                         </button>
                         <button
                             onClick={() => state.setActiveTab('binders')}
-                            className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold transition-all ${state.activeTab === 'binders' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}
+                            className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold transition-all relative ${state.activeTab === 'binders' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}
                         >
-                            <Book className="w-4 h-4" /> Albums
+                            <Book className="w-4 h-4" /> 
+                            Albums
+                            
+                            {/* Completion Badge (Completed & Claimed) */}
+                            {state.binderProgressions.some(p => p.isCompleted && state.claimedBinderIds.includes(p.binderId)) && (
+                                <span className={`ml-1 px-1.5 py-0.5 rounded-md text-[10px] font-black ${state.activeTab === 'binders' ? 'bg-white/20 text-white' : 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/20'}`}>
+                                    {state.binderProgressions.filter(p => p.isCompleted && state.claimedBinderIds.includes(p.binderId)).length}
+                                </span>
+                            )}
+
+                            {/* Claimable Notification Dot */}
+                            {state.binderProgressions.some(p => p.isCompleted && !state.claimedBinderIds.includes(p.binderId)) && (
+                                <span className="absolute -top-1 -right-1 w-3 h-3 bg-amber-500 rounded-full border-2 border-slate-900 animate-pulse shadow-[0_0_8px_rgba(245,158,11,0.5)]" />
+                            )}
                         </button>
                     </div>
                 </div>
@@ -54,6 +67,7 @@ export default function CollectionPage() {
                             toggleSelectionMode={state.toggleSelectionMode}
                             handleExport={state.handleExport}
                             handleImport={state.handleImport}
+                            claimedBinderIds={state.claimedBinderIds}
                             isExporting={state.isExporting}
                             isImporting={state.isImporting}
                         />
