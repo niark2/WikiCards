@@ -1,7 +1,7 @@
 "use client";
 
 import { Rarity } from "@/types";
-import { Layers, Calendar, Download, Upload, Search, Rocket, Crown, Sparkles, Library, Award } from "lucide-react";
+import { Layers, Calendar, Download, Upload, Search, Rocket, Crown, Sparkles, Library, Award, Shield, Gem, BookOpen, Globe, Zap, Bird, History, Cpu } from "lucide-react";
 import { SortOption } from "../_hooks/useCollectionState";
 import { BINDERS } from "@/lib/binders/config";
 
@@ -29,10 +29,18 @@ const RARITIES: (Rarity | "All")[] = ["All", "Legendary", "Epic", "Rare", "Uncom
 function AlbumIcon({ name, className = "" }: { name: string, className?: string }) {
     switch (name) {
         case 'Rocket': return <Rocket className={className} />;
+        case 'Bird': return <Bird className={className} />;
+        case 'History': return <History className={className} />;
+        case 'Cpu': return <Cpu className={className} />;
         case 'Layers': return <Layers className={className} />;
         case 'Crown': return <Crown className={className} />;
         case 'Sparkles': return <Sparkles className={className} />;
         case 'Library': return <Library className={className} />;
+        case 'Shield': return <Shield className={className} />;
+        case 'Gem': return <Gem className={className} />;
+        case 'BookOpen': return <BookOpen className={className} />;
+        case 'Globe': return <Globe className={className} />;
+        case 'Zap': return <Zap className={className} />;
         default: return <Award className={className} />;
     }
 }

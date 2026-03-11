@@ -10,9 +10,20 @@ export function isCardInBinder(card: WikiCard, binder: Binder): boolean {
         if (!card.wikiCategories || card.wikiCategories.length === 0) return false;
         
         return card.wikiCategories.some(cat => 
-            binder.criteria.categoryKeywords?.some(key => 
-                cat.toLowerCase().includes(key.toLowerCase())
-            )
+            binder.criteria.categoryKeywords?.some(key => {
+                const normalizedKey = key.trim().toLowerCase();
+                const normalizedCat = cat.toLowerCase();
+                
+                // Use word boundary to avoid partial matches (e.g. "ace" matching "space")
+                // We create the regex once per check, but it's more accurate
+                try {
+                    const regex = new RegExp(`\\b${normalizedKey}\\b`, 'i');
+                    return regex.test(normalizedCat);
+                } catch (e) {
+                    // Fallback to simple inclusion if regex fails
+                    return normalizedCat.includes(normalizedKey);
+                }
+            })
         );
     }
 
