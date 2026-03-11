@@ -36,8 +36,10 @@ export default function GamblingPage() {
     const [result, setResult] = useState<Reward | null>(null);
     const [wonCard, setWonCard] = useState<WikiCard | null>(null);
     const { showToast } = useToast();
+    const [cooldown, setCooldown] = useState(0);
     const controls = useAnimation();
     const wheelRef = useRef<HTMLDivElement>(null);
+    const cooldownTimerRef = useRef<NodeJS.Timeout | null>(null);
 
     const handleSpin = async () => {
         if (isSpinning) return;
@@ -82,6 +84,18 @@ export default function GamblingPage() {
 
             handleWin(winningReward);
             setIsSpinning(false);
+
+            // Start 3s cooldown
+            setCooldown(3);
+            cooldownTimerRef.current = setInterval(() => {
+                setCooldown(prev => {
+                    if (prev <= 1) {
+                        if (cooldownTimerRef.current) clearInterval(cooldownTimerRef.current);
+                        return 0;
+                    }
+                    return prev - 1;
+                });
+            }, 1000);
         } else {
             showToast("❌ Not enough WikiCoins!", "error");
         }
@@ -218,11 +232,16 @@ export default function GamblingPage() {
 
                         <button
                             onClick={handleSpin}
-                            disabled={isSpinning}
-                            className="mt-6 md:mt-8 group relative flex items-center gap-2 md:gap-3 px-6 md:px-8 py-3 md:py-4 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white rounded-2xl font-black text-base md:text-xl uppercase tracking-widest transition-all shadow-lg active:scale-95"
+                            disabled={isSpinning || cooldown > 0}
+                            className="mt-6 md:mt-8 group relative flex items-center gap-2 md:gap-3 px-6 md:px-8 py-3 md:py-4 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-2xl font-black text-base md:text-xl uppercase tracking-widest transition-all shadow-lg active:scale-95"
                         >
                             {isSpinning ? (
                                 <RefreshCw className="w-6 h-6 animate-spin" />
+                            ) : cooldown > 0 ? (
+                                <span className="flex items-center gap-2">
+                                    <CircleOff className="w-5 h-5 opacity-50" />
+                                    WAIT {cooldown}s
+                                </span>
                             ) : (
                                 `SPIN (${SPIN_COST} 🪙)`
                             )}
