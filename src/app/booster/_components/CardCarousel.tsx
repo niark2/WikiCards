@@ -15,6 +15,8 @@ interface CardCarouselProps {
     goToNextCard: () => void;
     selectedTheme: BoosterTheme;
     resetPack: () => void;
+    sellAll?: () => void;
+    sellCommon?: () => void;
 }
 
 export function CardCarousel({
@@ -26,6 +28,8 @@ export function CardCarousel({
     goToNextCard,
     selectedTheme,
     resetPack,
+    sellAll,
+    sellCommon,
 }: CardCarouselProps) {
     return (
         <div className="w-full h-full flex flex-col items-center justify-center relative">
@@ -117,19 +121,31 @@ export function CardCarousel({
                     <p className="text-lg md:text-2xl text-amber-100 font-serif font-black italic tracking-tight text-center">
                         5 New Cards Discovered
                     </p>
-                    <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                    <div className="flex flex-wrap md:flex-nowrap justify-center gap-3 w-full">
                         <button
                             onClick={resetPack}
-                            className="px-6 md:px-10 py-3 md:py-4 bg-amber-500 text-black font-black uppercase tracking-widest text-xs rounded-xl hover:bg-amber-400 transition-all shadow-[0_10px_30px_rgba(245,158,11,0.3)] active:scale-95 w-full sm:w-auto"
+                            className="px-4 md:px-6 py-3 md:py-3.5 bg-amber-500 text-black font-black uppercase tracking-widest text-[10px] md:text-xs rounded-xl hover:bg-amber-400 transition-all shadow-[0_10px_30px_rgba(245,158,11,0.3)] active:scale-95 text-center flex-1 sm:flex-none min-w-[120px] md:min-w-[150px]"
                         >
                             Summon Another
                         </button>
                         <a
                             href="/collection"
-                            className="px-6 md:px-10 py-3 md:py-4 bg-white/5 hover:bg-white/10 text-white font-black uppercase tracking-widest text-xs rounded-xl transition-all border border-white/10 backdrop-blur active:scale-95 text-center w-full sm:w-auto"
+                            className="px-4 md:px-6 py-3 md:py-3.5 bg-white/5 hover:bg-white/10 text-white font-black uppercase tracking-widest text-[10px] md:text-xs rounded-xl transition-all border border-white/10 backdrop-blur active:scale-95 text-center flex-1 sm:flex-none min-w-[120px] md:min-w-[150px]"
                         >
                             To Collection
                         </a>
+                        <button
+                            onClick={sellAll}
+                            className="px-4 md:px-6 py-3 md:py-3.5 bg-red-950/40 hover:bg-red-900/40 text-red-400 font-black uppercase tracking-widest text-[10px] md:text-xs rounded-xl transition-all border border-red-500/20 active:scale-95 text-center flex-1 sm:flex-none min-w-[120px] md:min-w-[150px]"
+                        >
+                            Sell All
+                        </button>
+                        <button
+                            onClick={sellCommon}
+                            className="px-4 md:px-6 py-3 md:py-3.5 bg-slate-800/40 hover:bg-slate-700/40 text-slate-300 font-black uppercase tracking-widest text-[10px] md:text-xs rounded-xl transition-all border border-white/10 active:scale-95 text-center flex-1 sm:flex-none min-w-[120px] md:min-w-[150px]"
+                        >
+                            Sell Common
+                        </button>
                     </div>
                 </motion.div>
             )}

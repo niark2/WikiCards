@@ -134,7 +134,7 @@ export const fetchFallbackImage = async (imageTitles: string[]): Promise<string 
 
 export const fetchArticleDetails = async (pageids: string[]): Promise<Record<string, WikiPageDetails>> => {
     const ids = pageids.join("|");
-    const url = `${WIKI_API_URL}?action=query&prop=extracts%7Cpageimages%7Cinfo%7Cimages&exintro=1&explaintext=1&piprop=original%7Cthumbnail&pithumbsize=800&pilicense=any&imlimit=20&inprop=url&pageids=${ids}&format=json&origin=*`;
+    const url = `${WIKI_API_URL}?action=query&prop=extracts%7Cpageimages%7Cinfo%7Cimages%7Ccategories&exintro=1&explaintext=1&piprop=original%7Cthumbnail&pithumbsize=800&pilicense=any&imlimit=50&cllimit=50&inprop=url&pageids=${ids}&format=json&origin=*`;
     const res = await fetch(url, { headers: { "User-Agent": USER_AGENT } });
     const data = await res.json();
     return data.query.pages as Record<string, WikiPageDetails>;
@@ -148,7 +148,7 @@ export const fetchWikiArticle = async (pageIdentifier: string, full: boolean = f
 
     // If full is true, we don't use exintro so we get more than just the first paragraph
     const introParam = full ? "" : "&exintro=1";
-    const url = `${WIKI_API_URL}?action=query&prop=extracts%7Cpageimages%7Cinfo%7Cimages&explaintext=1${introParam}&piprop=original%7Cthumbnail&pithumbsize=1000&pilicense=any&imlimit=20&inprop=url&${param}&redirects=1&format=json&origin=*`;
+    const url = `${WIKI_API_URL}?action=query&prop=extracts%7Cpageimages%7Cinfo%7Cimages%7Ccategories&explaintext=1${introParam}&piprop=original%7Cthumbnail&pithumbsize=1000&pilicense=any&imlimit=50&cllimit=50&inprop=url&${param}&redirects=1&format=json&origin=*`;
 
     try {
         const res = await fetch(url, { headers: { "User-Agent": USER_AGENT } });
@@ -172,6 +172,10 @@ export const fetchWikiArticle = async (pageIdentifier: string, full: boolean = f
             imageUrl = await fetchFallbackImage(details.images.map(img => img.title));
         }
 
+        const wikiCategories = details.categories
+            ?.map(cat => cat.title.replace(/^Category:/, ''))
+            .filter(cat => !/^(All |Articles |CS1 |Webarchive |Wikipedia |Commons category |Use dmy dates|Use mdy dates)/.test(cat)) || [];
+
         return {
             id: pageId,
             wikiId: pageId,
@@ -181,6 +185,7 @@ export const fetchWikiArticle = async (pageIdentifier: string, full: boolean = f
             views,
             rarity,
             url: details.fullurl || `https://en.wikipedia.org/?curid=${pageId}`,
+            wikiCategories,
         };
     } catch (e) {
         console.error("Error fetching Wiki article:", e);

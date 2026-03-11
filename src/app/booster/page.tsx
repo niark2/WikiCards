@@ -51,7 +51,7 @@ export default function BoosterPage() {
     };
 
     return (
-        <div className="flex flex-col md:flex-row min-h-[calc(100vh-4rem)] relative w-full overflow-hidden bg-slate-950 items-stretch">
+        <div className="flex flex-col md:flex-row h-[calc(100vh-4rem)] relative w-full overflow-hidden bg-slate-950 items-stretch">
             {/* Background Effects */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-500/5 blur-[120px] rounded-full pointer-events-none -z-10" />
 
@@ -233,7 +233,7 @@ export default function BoosterPage() {
             )}
 
             {booster.cards && !booster.loading && (
-                <div className="w-full min-h-[calc(100vh-4rem)] flex items-center justify-center p-2 md:p-6">
+                <div className="w-full h-[calc(100vh-4rem)] flex items-center justify-center p-2 md:p-6">
                     <CardCarousel
                         cards={booster.cards}
                         revealed={booster.revealed}
@@ -243,6 +243,8 @@ export default function BoosterPage() {
                         goToNextCard={booster.goToNextCard}
                         selectedTheme={booster.selectedTheme}
                         resetPack={booster.resetPack}
+                        sellAll={booster.sellAll}
+                        sellCommon={booster.sellCommon}
                     />
                 </div>
             )}

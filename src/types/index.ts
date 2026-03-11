@@ -13,6 +13,7 @@ export interface WikiCard {
     isCoinValue?: number; // If set, this card is actually just a coin bundle
     addedAt?: number; // Timestamp when card was added to collection
     obtainedFrom?: string; // Where the card was acquired (e.g., booster name, forge, market)
+    wikiCategories?: string[]; // Raw categories from Wikipedia for classification
 }
 
 export interface Playlist {

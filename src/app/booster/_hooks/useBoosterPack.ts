@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { WikiCard } from "@/types";
-import { saveCollection, logActivity, getDailyBoosterInfo, incrementDailyBooster } from "@/lib/storage";
+import { saveCollection, logActivity, getDailyBoosterInfo, incrementDailyBooster, removeCard } from "@/lib/storage";
+import { calculateCardValue } from "@/lib/rarity";
 import { useCoins } from "@/hooks/useCoins";
 import { useSound } from "@/hooks/useSound";
 import { useToast } from "@/hooks/useToast";
@@ -109,13 +110,19 @@ export function useBoosterPack() {
                     }
                 }
 
-                setCards(data.cards);
-
                 const articles = (data.cards as WikiCard[]).map(c => ({
                     ...c,
                     obtainedFrom: `Booster ${selectedTheme.label}`
                 })).filter(c => !c.isCoinValue);
-                saveCollection(articles);
+                const savedCards = saveCollection(articles);
+
+                // Merge back with coin cards and use the saved version (with unique IDs)
+                const finalCards = (data.cards as WikiCard[]).map(c => {
+                    if (c.isCoinValue) return c;
+                    return savedCards.find(sc => sc.wikiId === (c.wikiId || c.id)) || c;
+                });
+
+                setCards(finalCards);
 
                 if (selectedThemeId === "") {
                     incrementDailyBooster();
@@ -157,6 +164,40 @@ export function useBoosterPack() {
         setCurrentIndex(prev => Math.min(cards.length - 1, prev + 1));
     }, [cards]);
 
+    const sellCards = useCallback((cardsToSell: WikiCard[]) => {
+        if (!cardsToSell.length) return;
+
+        const totalValue = cardsToSell.reduce((acc, c) => acc + calculateCardValue(c), 0);
+
+        if (confirm(`Sell ${cardsToSell.length} cards for ${totalValue} WikiCoins?`)) {
+            cardsToSell.forEach(c => removeCard(c.id));
+            addCoins(totalValue);
+            logActivity('card_sold', `Sold ${cardsToSell.length} cards from booster`, totalValue);
+            showToast(`✅ Sold for ${totalValue} WikiCoins`, 'success');
+
+            // If we sold everything, reset
+            if (cards && cardsToSell.length === cards.filter(c => !c.isCoinValue).length) {
+                setCards(null);
+            } else {
+                // Remove sold cards from the current view
+                setCards(prev => prev ? prev.filter(c => !cardsToSell.find(ts => ts.id === c.id)) : null);
+                setCurrentIndex(0);
+            }
+        }
+    }, [addCoins, showToast, cards]);
+
+    const sellAll = useCallback(() => {
+        if (!cards) return;
+        const toSell = cards.filter(c => !c.isCoinValue);
+        sellCards(toSell);
+    }, [cards, sellCards]);
+
+    const sellCommon = useCallback(() => {
+        if (!cards) return;
+        const toSell = cards.filter(c => !c.isCoinValue && c.rarity === "Common");
+        sellCards(toSell);
+    }, [cards, sellCards]);
+
     return {
         // State
         loading,
@@ -178,5 +219,7 @@ export function useBoosterPack() {
         resetPack,
         goToPreviousCard,
         goToNextCard,
+        sellAll,
+        sellCommon,
     };
 }

@@ -7,10 +7,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Layers, Coins, Home, GalleryVertical, Hammer, BookOpen, ShoppingBag, Dices, ChevronDown, Compass, Menu, X } from "lucide-react";
 import { useCoins } from "@/hooks/useCoins";
 import { useSound } from "@/hooks/useSound";
+import { useToast } from "@/hooks/useToast";
 import { Volume2, VolumeX } from "lucide-react";
+import { canClaimDailyCoinReward, claimDailyCoinReward, logActivity } from "@/lib/storage";
 
 export function Navbar() {
-    const { coins } = useCoins();
+    const { coins, addCoins } = useCoins();
+    const { showToast } = useToast();
     const { isMuted, toggleMute } = useSound();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -19,7 +22,20 @@ export function Navbar() {
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setMounted(true);
-    }, []);
+
+        // Daily Coin Reward
+        if (canClaimDailyCoinReward()) {
+            const REWARD_AMOUNT = 50;
+            addCoins(REWARD_AMOUNT);
+            claimDailyCoinReward();
+            logActivity('coins_added', `Daily Reward: +${REWARD_AMOUNT} WikiCoins`, REWARD_AMOUNT);
+            
+            // Wait a bit for the UI to be ready
+            setTimeout(() => {
+                showToast(`Welcome back! +${REWARD_AMOUNT} WikiCoins added.`, 'success');
+            }, 1000);
+        }
+    }, [addCoins, showToast]);
 
 
     return (

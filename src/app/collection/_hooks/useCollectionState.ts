@@ -1,13 +1,16 @@
 "use client";
 
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { getCollection, getPlaylists, savePlaylists, removeCard, logActivity } from "@/lib/storage";
+import { getCollection, getPlaylists, savePlaylists, removeCard, logActivity, getClaimedBinders, markBinderAsClaimed } from "@/lib/storage";
 import { WikiCard, Rarity, Playlist } from "@/types";
 import { useCoins } from "@/hooks/useCoins";
 import { useSound } from "@/hooks/useSound";
 import { useToast } from "@/hooks/useToast";
 import { safeSetItem } from "@/lib/safe-storage";
 import { calculateCardValue, RARITY_SORT_ORDER } from "@/lib/rarity";
+import { BINDERS } from "@/lib/binders/config";
+import { calculateBinderProgress } from "@/lib/binders/logic";
+import { BinderProgress } from "@/lib/binders/types";
 
 export type SortOption = "recent" | "rarity" | "alphabetical";
 
@@ -30,6 +33,8 @@ export function useCollectionState() {
     const [sortBy, setSortBy] = useState<SortOption>("recent");
     const [isExporting, setIsExporting] = useState(false);
     const [isImporting, setIsImporting] = useState(false);
+    const [activeTab, setActiveTab] = useState<'inventory' | 'binders'>('inventory');
+    const [claimedBinderIds, setClaimedBinderIds] = useState<string[]>([]);
 
     const { addCoins, coins } = useCoins();
     const { playCoinSound } = useSound();
@@ -38,6 +43,7 @@ export function useCollectionState() {
     const refreshData = useCallback(() => {
         setCards(getCollection());
         setPlaylists(getPlaylists());
+        setClaimedBinderIds(getClaimedBinders());
     }, []);
 
     useEffect(() => {
@@ -100,6 +106,10 @@ export function useCollectionState() {
 
     const totalCollectionValue = useMemo(() => {
         return cards.reduce((acc, c) => acc + calculateCardValue(c), 0);
+    }, [cards]);
+
+    const binderProgressions = useMemo(() => {
+        return BINDERS.map(binder => calculateBinderProgress(binder, cards));
     }, [cards]);
 
     // --- Handlers ---
@@ -323,6 +333,15 @@ export function useCollectionState() {
         input.click();
     }, [cards, playlists, coins, refreshData, showToast]);
 
+    const handleClaimBinderReward = useCallback((binderId: string, amount: number) => {
+        markBinderAsClaimed(binderId);
+        addCoins(amount);
+        playCoinSound();
+        logActivity('coins_added', `Claimed binder reward: ${binderId}`, amount);
+        showToast(`🏆 Claimed ${amount} WikiCoins!`, 'success');
+        refreshData();
+    }, [addCoins, playCoinSound, showToast, refreshData]);
+
     return {
         // Data
         cards,
@@ -364,5 +383,12 @@ export function useCollectionState() {
         handleImport,
         isExporting,
         isImporting,
+
+        // Binders
+        activeTab,
+        setActiveTab,
+        binderProgressions,
+        claimedBinderIds,
+        handleClaimBinderReward,
     };
 }

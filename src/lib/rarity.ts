@@ -46,6 +46,14 @@ export const RARITY_SELL_VALUES: Record<Rarity, number> = {
     Legendary: 500,
 };
 
+export const RARITY_COLORS: Record<Rarity, string> = {
+    Common: "#94a3b8", // Slate 400
+    Uncommon: "#22c55e", // Green 500
+    Rare: "#3b82f6", // Blue 500
+    Epic: "#a855f7", // Purple 500
+    Legendary: "#eab308", // Yellow 500
+};
+
 // --- Costs to forge/craft a card ---
 
 export const RARITY_CRAFT_COSTS: Record<Rarity, number> = {

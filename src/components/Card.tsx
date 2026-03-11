@@ -5,7 +5,7 @@ import { RarityBadge } from "./RarityBadge";
 import Image from "next/image";
 import Link from "next/link";
 import { Eye } from "lucide-react";
-import { memo } from "react";
+import { memo, useState } from "react";
 import { formatViews } from "@/lib/format";
 
 interface CardProps {
@@ -32,6 +32,8 @@ const holoLayers = {
 };
 
 export const Card = memo(function Card({ card, isRevealed = true, count = 1, hideLink = false }: CardProps) {
+    const [imageError, setImageError] = useState(false);
+
     if (!isRevealed) {
         return (
             <div className="w-64 h-96 rounded-2xl bg-slate-900 border-2 border-slate-800 flex items-center justify-center flex-col gap-4 shadow-xl">
@@ -67,10 +69,19 @@ export const Card = memo(function Card({ card, isRevealed = true, count = 1, hid
                             <Eye className="w-12 h-12 text-amber-500" />
                         </div>
                     </div>
-                ) : card.imageUrl ? (
-                    <Image src={card.imageUrl} alt={card.title} fill className="object-cover opacity-80" unoptimized />
+                ) : (card.imageUrl && !imageError) ? (
+                    <div className="relative w-full h-full">
+                        <Image 
+                            src={card.imageUrl} 
+                            alt={card.title} 
+                            fill 
+                            className="object-cover opacity-80" 
+                            unoptimized 
+                            onError={() => setImageError(true)}
+                        />
+                    </div>
                 ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-slate-800 text-slate-600 font-serif text-5xl">W</div>
+                    <div className="w-full h-full flex items-center justify-center bg-slate-800 text-slate-600 font-serif text-5xl italic font-black">W</div>
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent" />
             </div>

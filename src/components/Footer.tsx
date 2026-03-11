@@ -1,9 +1,15 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Github, HelpCircle, Ticket } from "lucide-react";
 
 export function Footer() {
+    const pathname = usePathname();
+    
+    // Hide footer on booster page for a more immersive experience
+    if (pathname === '/booster') return null;
+
     return (
         <footer className="w-full py-2 px-6 bg-slate-950/50 backdrop-blur-md border-t border-white/5 mt-auto">
             <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-2 md:gap-4">

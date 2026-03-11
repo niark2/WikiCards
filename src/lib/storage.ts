@@ -15,6 +15,8 @@ const LOGS_KEY = "wikicards_logs";
 const DAILY_BOOSTER_KEY = "wikicards_daily_booster";
 const MARKET_KEY = "wikicards_daily_market";
 const REDEEMED_CODES_KEY = "wikicards_redeemed_codes";
+const DAILY_COIN_REWARD_KEY = "wikicards_daily_coin_reward";
+const CLAIMED_BINDERS_KEY = "wikicards_claimed_binders";
 
 export interface DailyBoosterInfo {
     count: number;
@@ -107,9 +109,10 @@ export const getCollection = (): WikiCard[] => {
     return safeGetJSON<WikiCard[]>(COLLECTION_KEY, []);
 };
 
-export const saveCollection = (newCards: WikiCard[]): void => {
-    if (!isClientSide()) return;
+export const saveCollection = (newCards: WikiCard[]): WikiCard[] => {
+    if (!isClientSide()) return [];
     const current = getCollection();
+    const savedCards: WikiCard[] = [];
 
     newCards.forEach(card => {
         // We now allow duplicates. To make each card instance unique,
@@ -125,9 +128,11 @@ export const saveCollection = (newCards: WikiCard[]): void => {
             obtainedFrom: card.obtainedFrom || 'Unknown Source'
         };
         current.push(cardToSave);
+        savedCards.push(cardToSave);
     });
 
     safeSetJSON(COLLECTION_KEY, current);
+    return savedCards;
 };
 
 export const removeCard = (cardId: string): void => {
@@ -201,5 +206,40 @@ export const markCodeAsRedeemed = (code: string): void => {
     if (!redeemed.includes(code)) {
         redeemed.push(code);
         safeSetJSON(REDEEMED_CODES_KEY, redeemed);
+    }
+};
+
+export const canClaimDailyCoinReward = (): boolean => {
+    if (!isClientSide()) return false;
+    
+    const lastReward = localStorage.getItem(DAILY_COIN_REWARD_KEY);
+    const today = new Date().toDateString();
+
+    // If it's the first time EVER (totally new visitor)
+    if (localStorage.getItem(COLLECTION_KEY) === null && lastReward === null) {
+        // Mark as "rewarded" for today so they don't get it immediately
+        localStorage.setItem(DAILY_COIN_REWARD_KEY, today);
+        return false;
+    }
+
+    return lastReward !== today;
+};
+
+export const claimDailyCoinReward = (): void => {
+    if (!isClientSide()) return;
+    const today = new Date().toDateString();
+    localStorage.setItem(DAILY_COIN_REWARD_KEY, today);
+};
+
+export const getClaimedBinders = (): string[] => {
+    return safeGetJSON<string[]>(CLAIMED_BINDERS_KEY, []);
+};
+
+export const markBinderAsClaimed = (binderId: string): void => {
+    if (!isClientSide()) return;
+    const claimed = getClaimedBinders();
+    if (!claimed.includes(binderId)) {
+        claimed.push(binderId);
+        safeSetJSON(CLAIMED_BINDERS_KEY, claimed);
     }
 };

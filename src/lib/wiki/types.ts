@@ -19,6 +19,7 @@ export interface WikiPageDetails {
     fullurl?: string;
     missing?: string;
     images?: { title: string }[];
+    categories?: { title: string }[];
 }
 
 export interface WikiImageInfo {
