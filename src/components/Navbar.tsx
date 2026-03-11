@@ -19,6 +19,9 @@ export function Navbar() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [mounted, setMounted] = useState(false);
 
+    const [isVisible, setIsVisible] = useState(true);
+    const [lastScrollY, setLastScrollY] = useState(0);
+
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setMounted(true);
@@ -35,12 +38,34 @@ export function Navbar() {
                 showToast(`Welcome back! +${REWARD_AMOUNT} WikiCoins added.`, 'success');
             }, 1000);
         }
-    }, [addCoins, showToast]);
+
+        const handleScroll = () => {
+            const currentScrollY = window.scrollY;
+            
+            if (currentScrollY < 10) {
+                setIsVisible(true);
+            } else if (currentScrollY > lastScrollY) {
+                setIsVisible(false);
+            } else {
+                setIsVisible(true);
+            }
+            
+            setLastScrollY(currentScrollY);
+        };
+
+        window.addEventListener("scroll", handleScroll, { passive: true });
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, [lastScrollY]);
 
 
     return (
         <>
-            <nav className="fixed top-0 w-full z-[100] bg-slate-900/80 backdrop-blur-xl border-b border-white/5">
+            <motion.nav 
+                initial={{ y: 0 }}
+                animate={{ y: isVisible ? 0 : -80 }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+                className="fixed top-0 w-full z-[100] bg-slate-900/80 backdrop-blur-xl border-b border-white/5"
+            >
                 <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-3 group">
                         <div className="w-10 h-10 rounded-xl bg-indigo-600/10 flex items-center justify-center border border-indigo-500/20 group-hover:bg-indigo-600/20 transition-all duration-300">
@@ -144,7 +169,7 @@ export function Navbar() {
                         </button>
                     </div>
                 </div>
-            </nav>
+            </motion.nav>
 
             {/* Mobile Drawer — Portaled to body to avoid nav clipping */}
             {mounted && createPortal(
