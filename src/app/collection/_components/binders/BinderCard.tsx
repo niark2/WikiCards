@@ -22,15 +22,15 @@ export function BinderCard({ binder, progress, isClaimed, onViewDetails, onClaim
             whileHover={{ y: -5 }}
             className="bg-slate-900/40 border border-white/10 rounded-2xl overflow-hidden backdrop-blur-sm group hover:border-indigo-500/50 transition-colors"
         >
-            <div className="p-6">
-                <div className="flex items-start justify-between mb-4">
-                    <div className={`p-3 rounded-xl ${isCompleted ? 'bg-indigo-500/20 text-indigo-400' : 'bg-slate-800 text-slate-400'} group-hover:scale-110 transition-transform`}>
-                        <Icon className="w-6 h-6" />
+            <div className="p-5">
+                <div className="flex items-start justify-between mb-3">
+                    <div className={`p-2.5 rounded-xl ${isCompleted ? 'bg-indigo-500/20 text-indigo-400' : 'bg-slate-800 text-slate-400'} group-hover:scale-110 transition-transform`}>
+                        <Icon className="w-5 h-5" />
                     </div>
                 </div>
 
-                <h3 className="text-xl font-bold text-white mb-2">{binder.title}</h3>
-                <p className="text-slate-400 text-sm mb-6 line-clamp-2 h-10">
+                <h3 className="text-lg font-bold text-white mb-1.5 line-clamp-1">{binder.title}</h3>
+                <p className="text-slate-400 text-xs mb-4 line-clamp-2 h-8">
                     {binder.description}
                 </p>
 

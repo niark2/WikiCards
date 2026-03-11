@@ -47,7 +47,7 @@ export function BinderGrid({ binders, progressions, claimedBinderIds, collection
                             <p className="text-sm text-slate-500 font-medium ml-4.5">{category.description}</p>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                             {categoryBinders.map(binder => {
                                 const progress = progressions.find(p => p.binderId === binder.id) || {
                                     binderId: binder.id,
