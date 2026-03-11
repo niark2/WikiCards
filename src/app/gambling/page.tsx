@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence, useAnimation } from "framer-motion";
 import { Coins, Trophy, RefreshCw, Star, Dices, CircleOff } from "lucide-react";
 import { useCoins } from "@/hooks/useCoins";
 import { useSound } from "@/hooks/useSound";
 import { useToast } from "@/hooks/useToast";
-import { saveCollection, logActivity } from "@/lib/storage";
+import { saveCollection, logActivity, canClaimDailyFreeSpin, claimDailyFreeSpin } from "@/lib/storage";
 import { Card } from "@/components/Card";
 import { WikiCard } from "@/types";
 
@@ -40,15 +40,29 @@ export default function GamblingPage() {
     const controls = useAnimation();
     const wheelRef = useRef<HTMLDivElement>(null);
     const cooldownTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const [canSpinFree, setCanSpinFree] = useState(false);
+
+    useEffect(() => {
+        setCanSpinFree(canClaimDailyFreeSpin());
+    }, []);
 
     const handleSpin = async () => {
-        if (isSpinning) return;
+        if (isSpinning || cooldown > 0) return;
 
-        if (deductCoins(SPIN_COST)) {
+        const isFree = canSpinFree;
+
+        if (isFree || deductCoins(SPIN_COST)) {
             setIsSpinning(true);
             setResult(null);
             setWonCard(null);
-            logActivity('coins_added', `Bet ${SPIN_COST} on the WikiWheel`, -SPIN_COST);
+
+            if (isFree) {
+                claimDailyFreeSpin();
+                setCanSpinFree(false);
+                logActivity('coins_added', `Used Daily Free Spin on the WikiWheel`, 0);
+            } else {
+                logActivity('coins_added', `Bet ${SPIN_COST} on the WikiWheel`, -SPIN_COST);
+            }
 
             const roll = Math.random();
             let cumulativeChance = 0;
@@ -242,6 +256,8 @@ export default function GamblingPage() {
                                     <CircleOff className="w-5 h-5 opacity-50" />
                                     WAIT {cooldown}s
                                 </span>
+                            ) : canSpinFree ? (
+                                "FREE SPIN"
                             ) : (
                                 `SPIN (${SPIN_COST} 🪙)`
                             )}

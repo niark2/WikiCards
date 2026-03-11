@@ -16,6 +16,7 @@ const DAILY_BOOSTER_KEY = "wikicards_daily_booster";
 const MARKET_KEY = "wikicards_daily_market";
 const REDEEMED_CODES_KEY = "wikicards_redeemed_codes";
 const DAILY_COIN_REWARD_KEY = "wikicards_daily_coin_reward";
+const DAILY_FREE_SPIN_KEY = "wikicards_daily_free_spin";
 const CLAIMED_BINDERS_KEY = "wikicards_claimed_binders";
 
 export interface DailyBoosterInfo {
@@ -229,6 +230,19 @@ export const claimDailyCoinReward = (): void => {
     if (!isClientSide()) return;
     const today = new Date().toDateString();
     localStorage.setItem(DAILY_COIN_REWARD_KEY, today);
+};
+
+export const canClaimDailyFreeSpin = (): boolean => {
+    if (!isClientSide()) return false;
+    const lastSpin = localStorage.getItem(DAILY_FREE_SPIN_KEY);
+    const today = new Date().toDateString();
+    return lastSpin !== today;
+};
+
+export const claimDailyFreeSpin = (): void => {
+    if (!isClientSide()) return;
+    const today = new Date().toDateString();
+    localStorage.setItem(DAILY_FREE_SPIN_KEY, today);
 };
 
 export const getClaimedBinders = (): string[] => {
