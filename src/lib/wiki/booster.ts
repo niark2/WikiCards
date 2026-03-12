@@ -246,13 +246,14 @@ export const generateBoosterPack = async (
 };
 
 /** Generate a single card with a specific natural rarity (used by WikiWheel) */
-export const generateNaturalCard = async (targetRarity: 'Epic' | 'Legendary' | 'Rare'): Promise<WikiCard | null> => {
-    let tier: "Top" | "High" | "Mid" = "Mid";
+export const generateNaturalCard = async (targetRarity: Rarity): Promise<WikiCard | null> => {
+    let tier: "Top" | "High" | "Mid" | "Random" = "Mid";
     if (targetRarity === 'Legendary') tier = "Top";
     else if (targetRarity === 'Epic') tier = "High";
+    else if (targetRarity === 'Common' || targetRarity === 'Uncommon') tier = "Random";
 
     let attempts = 0;
-    while (attempts < 10) {
+    while (attempts < 15) {
         attempts++;
         // Use slot logic to get articles from the correct popularity strata
         const candidates = await fetchSlotArticles(undefined, 1, tier);
@@ -262,9 +263,8 @@ export const generateNaturalCard = async (targetRarity: 'Epic' | 'Legendary' | '
             if (card.rarity === targetRarity) {
                 return card;
             }
-            // If it's a Legendary but we wanted Epic, it's still "rare enough" but maybe we want strict?
-            // User says "il booste", so we want it to be REAL. 
-            // If we hit a Legendary while looking for an Epic, it's even better, we can return it.
+            // Logic for "at least as good as":
+            // if (RARITY_WEIGHT[card.rarity] >= RARITY_WEIGHT[targetRarity]) return card;
         }
     }
 
